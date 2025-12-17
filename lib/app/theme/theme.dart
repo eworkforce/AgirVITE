@@ -11,7 +11,6 @@ class AppTheme {
           secondary: AppColors.secondary,
           surface: AppColors.background,
           error: AppColors.emergency,
-          background: AppColors.background,
         ),
         scaffoldBackgroundColor: AppColors.background,
         textTheme: AppTypography.textTheme,
@@ -41,7 +40,6 @@ class AppTheme {
           secondary: AppColors.secondary,
           surface: AppColors.darkBackground,
           error: AppColors.emergency,
-          background: AppColors.darkBackground,
         ),
         scaffoldBackgroundColor: AppColors.darkBackground,
         // TODO: Adapt typography for dark mode (colors)

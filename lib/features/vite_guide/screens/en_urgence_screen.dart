@@ -26,7 +26,7 @@ class EnUrgenceScreen extends StatelessWidget {
             height: 250,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppColors.emergency.withOpacity(0.1),
+                        color: AppColors.emergency.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Center(

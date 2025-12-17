@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -12,7 +14,7 @@ class OCRService {
       final apiKey = dotenv.env['GEMINI_API_KEY'];
       if (apiKey == null) {
         // Fallback or error if key missing
-        print('GEMINI_API_KEY not found in .env');
+        debugPrint('GEMINI_API_KEY not found in .env');
         return _fallbackStub();
       }
 
@@ -35,19 +37,20 @@ class OCRService {
       // Basic cleanup for JSON parsing (remove markdown code blocks if any)
       final jsonString = text.replaceAll('```json', '').replaceAll('```', '').trim();
       
-      // Simple regex extraction or actual JSON parsing
-      // For robustness, let's look for patterns if JSON fails, or assume strict JSON
-      // Here we assume the model obeys the prompt.
-      
-      // ... JSON Parsing Logic ...
-      // For this step, since we don't have a real API key in environment for the test,
-      // I will leave the logic but assume it might fail without a key.
-      
-      // Mocking successful parse for now as we don't have a real key injected yet
-      return _fallbackStub(); 
+      try {
+        final Map<String, dynamic> data = json.decode(jsonString);
+        return {
+          'systolic': data['sys'] is int ? data['sys'] : int.tryParse(data['sys'].toString()) ?? 120,
+          'diastolic': data['dia'] is int ? data['dia'] : int.tryParse(data['dia'].toString()) ?? 80,
+          'pulse': data['pulse'] is int ? data['pulse'] : int.tryParse(data['pulse'].toString()) ?? 70,
+        };
+      } catch (e) {
+        debugPrint('JSON Parsing Error: $e');
+        return _fallbackStub();
+      }
 
     } catch (e) {
-      print('Gemini Error: $e');
+      debugPrint('Gemini Error: $e');
       return _fallbackStub();
     }
   }

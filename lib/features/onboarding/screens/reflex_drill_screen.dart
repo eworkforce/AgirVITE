@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/theme/colors.dart';
-import '../providers/onboarding_provider.dart';
 
 class ReflexDrillScreen extends ConsumerStatefulWidget {
   const ReflexDrillScreen({super.key});
@@ -48,19 +47,9 @@ class _ReflexDrillScreenState extends ConsumerState<ReflexDrillScreen> {
     // Haptic feedback
     HapticFeedback.heavyImpact();
     
-    // Mark onboarding as complete in repository
-    await ref.read(onboardingControllerProvider.notifier).completeOnboarding();
-
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Bravo ! Vous avez le réflexe.'),
-          backgroundColor: AppColors.success,
-        ),
-      );
-      
-      // Navigate to Dashboard
-      context.go('/dashboard');
+      // Navigate to Profile Setup
+      context.go('/onboarding/profile');
     }
   }
 
@@ -109,7 +98,7 @@ class _ReflexDrillScreenState extends ConsumerState<ReflexDrillScreen> {
                     color: AppColors.emergency,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.emergency.withOpacity(0.4),
+                  color: AppColors.emergency.withValues(alpha: 0.3),
                         blurRadius: 20,
                         spreadRadius: 5,
                         offset: const Offset(0, 10),

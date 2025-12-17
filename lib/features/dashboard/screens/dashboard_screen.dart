@@ -24,13 +24,32 @@ class DashboardScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header
-                  Text(
-                    'Bonjour,',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  Text(
-                    'Votre santé, notre priorité',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Bonjour,',
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                            Text(
+                              'Votre santé, notre priorité',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => context.push('/profile'),
+                        icon: const CircleAvatar(
+                          backgroundColor: AppColors.primary,
+                          child: Icon(Icons.person, color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   
@@ -49,7 +68,7 @@ class DashboardScreen extends ConsumerWidget {
                             final status = service.getStatus(reading.systolic, reading.diastolic);
                             return status.contains('Hypertension') ? AppColors.emergency : AppColors.success;
                           },
-                          error: (_, __) => Colors.grey,
+                          error: (error, stack) => Colors.grey,
                           loading: () => Colors.grey,
                         ),
                         width: 2,

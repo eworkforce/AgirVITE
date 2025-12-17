@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../app/theme/colors.dart';
 
 class VisageScreen extends StatelessWidget {
   final VoidCallback onNext;

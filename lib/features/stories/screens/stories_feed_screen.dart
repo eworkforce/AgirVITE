@@ -58,7 +58,7 @@ class _StoryItemState extends State<StoryItem> {
       _controller!.play();
       if (mounted) setState(() => _initialized = true);
     } catch (e) {
-      print('Video Error: $e');
+      debugPrint('Video Error: $e');
     }
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/theme/colors.dart';
 import '../../../core/services/emergency_service.dart';
+import '../../guardians/providers/guardians_provider.dart';
 
 class SOSButton extends ConsumerStatefulWidget {
   const SOSButton({super.key});
@@ -12,7 +13,6 @@ class SOSButton extends ConsumerStatefulWidget {
 
 class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
   bool _isPressed = false;
 
   @override
@@ -22,7 +22,6 @@ class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProvider
       vsync: this,
       duration: const Duration(seconds: 2), // 2 seconds long press
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(_controller);
     
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -36,8 +35,11 @@ class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProvider
     _controller.reset();
     
     // Trigger Service
+    final guardiansAsync = ref.read(guardiansListProvider);
+    final numbers = guardiansAsync.valueOrNull?.map((g) => g.phoneNumber).toList() ?? [];
+    
     ref.read(emergencyServiceProvider).callSAMU();
-    ref.read(emergencyServiceProvider).sendWhatsAppAlert([]); // TODO: Pass real numbers
+    ref.read(emergencyServiceProvider).sendWhatsAppAlert(numbers);
     
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -82,7 +84,7 @@ class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProvider
               color: AppColors.emergency,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.emergency.withOpacity(0.4),
+                  color: AppColors.emergency.withValues(alpha: 0.4),
                   blurRadius: 10 + (_controller.value * 10),
                   spreadRadius: 2 + (_controller.value * 5),
                 )

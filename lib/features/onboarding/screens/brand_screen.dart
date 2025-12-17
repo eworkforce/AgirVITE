@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../app/theme/colors.dart';
+import '../providers/onboarding_provider.dart';
 
-class BrandScreen extends StatelessWidget {
+class BrandScreen extends ConsumerWidget {
   const BrandScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -55,7 +57,14 @@ class BrandScreen extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => context.go('/onboarding/pledge'),
+                  onPressed: () {
+                    final isComplete = ref.read(onboardingControllerProvider).valueOrNull ?? false;
+                    if (isComplete) {
+                      context.go('/dashboard');
+                    } else {
+                      context.go('/onboarding/pledge');
+                    }
+                  },
                   child: const Text('Continuer'),
                 ),
               ),

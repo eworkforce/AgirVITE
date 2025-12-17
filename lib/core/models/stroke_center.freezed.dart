@@ -31,9 +31,11 @@ mixin _$StrokeCenter {
   @HiveField(4)
   double get longitude => throw _privateConstructorUsedError;
   @HiveField(5)
-  bool get hasCTScanner => throw _privateConstructorUsedError;
-  @HiveField(6)
   String get phone => throw _privateConstructorUsedError;
+  @HiveField(6)
+  bool get hasScanner => throw _privateConstructorUsedError;
+  @HiveField(7)
+  bool get isOpen247 => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -53,8 +55,9 @@ abstract class $StrokeCenterCopyWith<$Res> {
       @HiveField(2) String address,
       @HiveField(3) double latitude,
       @HiveField(4) double longitude,
-      @HiveField(5) bool hasCTScanner,
-      @HiveField(6) String phone});
+      @HiveField(5) String phone,
+      @HiveField(6) bool hasScanner,
+      @HiveField(7) bool isOpen247});
 }
 
 /// @nodoc
@@ -75,8 +78,9 @@ class _$StrokeCenterCopyWithImpl<$Res, $Val extends StrokeCenter>
     Object? address = null,
     Object? latitude = null,
     Object? longitude = null,
-    Object? hasCTScanner = null,
     Object? phone = null,
+    Object? hasScanner = null,
+    Object? isOpen247 = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -99,14 +103,18 @@ class _$StrokeCenterCopyWithImpl<$Res, $Val extends StrokeCenter>
           ? _value.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double,
-      hasCTScanner: null == hasCTScanner
-          ? _value.hasCTScanner
-          : hasCTScanner // ignore: cast_nullable_to_non_nullable
-              as bool,
       phone: null == phone
           ? _value.phone
           : phone // ignore: cast_nullable_to_non_nullable
               as String,
+      hasScanner: null == hasScanner
+          ? _value.hasScanner
+          : hasScanner // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isOpen247: null == isOpen247
+          ? _value.isOpen247
+          : isOpen247 // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -125,8 +133,9 @@ abstract class _$$StrokeCenterImplCopyWith<$Res>
       @HiveField(2) String address,
       @HiveField(3) double latitude,
       @HiveField(4) double longitude,
-      @HiveField(5) bool hasCTScanner,
-      @HiveField(6) String phone});
+      @HiveField(5) String phone,
+      @HiveField(6) bool hasScanner,
+      @HiveField(7) bool isOpen247});
 }
 
 /// @nodoc
@@ -145,8 +154,9 @@ class __$$StrokeCenterImplCopyWithImpl<$Res>
     Object? address = null,
     Object? latitude = null,
     Object? longitude = null,
-    Object? hasCTScanner = null,
     Object? phone = null,
+    Object? hasScanner = null,
+    Object? isOpen247 = null,
   }) {
     return _then(_$StrokeCenterImpl(
       id: null == id
@@ -169,14 +179,18 @@ class __$$StrokeCenterImplCopyWithImpl<$Res>
           ? _value.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double,
-      hasCTScanner: null == hasCTScanner
-          ? _value.hasCTScanner
-          : hasCTScanner // ignore: cast_nullable_to_non_nullable
-              as bool,
       phone: null == phone
           ? _value.phone
           : phone // ignore: cast_nullable_to_non_nullable
               as String,
+      hasScanner: null == hasScanner
+          ? _value.hasScanner
+          : hasScanner // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isOpen247: null == isOpen247
+          ? _value.isOpen247
+          : isOpen247 // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -191,8 +205,9 @@ class _$StrokeCenterImpl implements _StrokeCenter {
       @HiveField(2) required this.address,
       @HiveField(3) required this.latitude,
       @HiveField(4) required this.longitude,
-      @HiveField(5) required this.hasCTScanner,
-      @HiveField(6) required this.phone});
+      @HiveField(5) required this.phone,
+      @HiveField(6) this.hasScanner = false,
+      @HiveField(7) this.isOpen247 = true});
 
   factory _$StrokeCenterImpl.fromJson(Map<String, dynamic> json) =>
       _$$StrokeCenterImplFromJson(json);
@@ -214,14 +229,19 @@ class _$StrokeCenterImpl implements _StrokeCenter {
   final double longitude;
   @override
   @HiveField(5)
-  final bool hasCTScanner;
-  @override
-  @HiveField(6)
   final String phone;
+  @override
+  @JsonKey()
+  @HiveField(6)
+  final bool hasScanner;
+  @override
+  @JsonKey()
+  @HiveField(7)
+  final bool isOpen247;
 
   @override
   String toString() {
-    return 'StrokeCenter(id: $id, name: $name, address: $address, latitude: $latitude, longitude: $longitude, hasCTScanner: $hasCTScanner, phone: $phone)';
+    return 'StrokeCenter(id: $id, name: $name, address: $address, latitude: $latitude, longitude: $longitude, phone: $phone, hasScanner: $hasScanner, isOpen247: $isOpen247)';
   }
 
   @override
@@ -236,15 +256,17 @@ class _$StrokeCenterImpl implements _StrokeCenter {
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
-            (identical(other.hasCTScanner, hasCTScanner) ||
-                other.hasCTScanner == hasCTScanner) &&
-            (identical(other.phone, phone) || other.phone == phone));
+            (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.hasScanner, hasScanner) ||
+                other.hasScanner == hasScanner) &&
+            (identical(other.isOpen247, isOpen247) ||
+                other.isOpen247 == isOpen247));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, name, address, latitude, longitude, hasCTScanner, phone);
+  int get hashCode => Object.hash(runtimeType, id, name, address, latitude,
+      longitude, phone, hasScanner, isOpen247);
 
   @JsonKey(ignore: true)
   @override
@@ -267,8 +289,9 @@ abstract class _StrokeCenter implements StrokeCenter {
       @HiveField(2) required final String address,
       @HiveField(3) required final double latitude,
       @HiveField(4) required final double longitude,
-      @HiveField(5) required final bool hasCTScanner,
-      @HiveField(6) required final String phone}) = _$StrokeCenterImpl;
+      @HiveField(5) required final String phone,
+      @HiveField(6) final bool hasScanner,
+      @HiveField(7) final bool isOpen247}) = _$StrokeCenterImpl;
 
   factory _StrokeCenter.fromJson(Map<String, dynamic> json) =
       _$StrokeCenterImpl.fromJson;
@@ -290,10 +313,13 @@ abstract class _StrokeCenter implements StrokeCenter {
   double get longitude;
   @override
   @HiveField(5)
-  bool get hasCTScanner;
+  String get phone;
   @override
   @HiveField(6)
-  String get phone;
+  bool get hasScanner;
+  @override
+  @HiveField(7)
+  bool get isOpen247;
   @override
   @JsonKey(ignore: true)
   _$$StrokeCenterImplCopyWith<_$StrokeCenterImpl> get copyWith =>

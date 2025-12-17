@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:agir_vite/app/app.dart';
 import 'package:agir_vite/core/repositories/onboarding_repository.dart';
-import 'package:agir_vite/features/dashboard/screens/dashboard_screen.dart';
 import 'package:agir_vite/features/onboarding/screens/brand_screen.dart';
 import 'package:agir_vite/features/onboarding/screens/pledge_screen.dart';
 import 'package:agir_vite/features/onboarding/screens/reflex_drill_screen.dart';
+
+import 'package:agir_vite/features/onboarding/screens/profile_setup_screen.dart';
 
 // Fake Repository
 class FakeOnboardingRepository implements IOnboardingRepository {
@@ -55,7 +55,7 @@ void main() {
     expect(find.text("Le Réflexe V.I.T.E."), findsOneWidget);
 
     // 4. Perform Reflex Drill (Long Press)
-    final sosButton = find.byType(GestureDetector).first; // Needs specific finder usually, but here it's the main interaction
+    // final sosButton = find.byType(GestureDetector).first; // Needs specific finder usually, but here it's the main interaction
     // Or find by text inside the button or specific key if added. 
     // The button has a child Stack with "SOS" text.
     final sosFinder = find.text('SOS');
@@ -100,8 +100,9 @@ void main() {
       await gesture.up();
       await tester.pumpAndSettle();
   
-      // Should be on Dashboard now
-      expect(find.byType(DashboardScreen), findsOneWidget);
-      expect(await fakeRepository.isOnboardingComplete(), isTrue);
+      // Should be on Profile Setup Screen now (NOT Dashboard)
+      expect(find.byType(ProfileSetupScreen), findsOneWidget);
+      // Onboarding is NOT complete yet
+      expect(await fakeRepository.isOnboardingComplete(), isFalse);
     });
 }

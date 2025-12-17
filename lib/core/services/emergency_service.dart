@@ -1,8 +1,9 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'location_service.dart';
 
-final emergencyServiceProvider = Provider((ref) => EmergencyService(LocationService()));
+final emergencyServiceProvider = Provider((ref) => EmergencyService(ref.read(locationServiceProvider)));
 
 class EmergencyService {
   final LocationService _locationService;
@@ -26,29 +27,29 @@ class EmergencyService {
 
   Future<void> sendWhatsAppAlert(List<String> phoneNumbers) async {
     // 1. Get Location
-    // Position? position;
-    // try {
-    //   position = await _locationService.getCurrentLocation();
-    // } catch (e) {
-    //   // Proceed without location if fails
-    // }
+    Position? position;
+    try {
+      position = await _locationService.getCurrentLocation();
+    } catch (e) {
+      // Proceed without location if fails
+    }
     
-    // For V1, we just open WhatsApp for the first contact or a general share
-    // Implementing deep linking for specific numbers:
-    
-    // TODO: Loop through numbers and send or create a group link
-    // For now, simpler implementation:
-    // https://wa.me/?text=...
-    
+    // Construct Message
     String message = "🚨 AIDEZ-MOI ! Je pense faire un AVC.";
-    // if (position != null) {
-    //   message += "\nMa position : https://maps.google.com/?q=${position.latitude},${position.longitude}";
-    // }
+    if (position != null) {
+      // Use Google Maps link as Plus Code alternative for broad compatibility
+      message += "\nMa position : https://maps.google.com/?q=${position.latitude},${position.longitude}";
+    }
 
+    // 2. Launch WhatsApp
+    // If we have specific numbers, we could target them, but for now we use the generic share
+    // which allows broadcasting to any contact/group.
     final Uri whatsappUri = Uri.parse("https://wa.me/?text=${Uri.encodeComponent(message)}");
     
     if (await canLaunchUrl(whatsappUri)) {
       await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+    } else {
+       // Fallback to SMS if WhatsApp fails? Or just log
     }
   }
 }

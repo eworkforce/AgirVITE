@@ -22,15 +22,16 @@ class StrokeCenterImplAdapter extends TypeAdapter<_$StrokeCenterImpl> {
       address: fields[2] as String,
       latitude: fields[3] as double,
       longitude: fields[4] as double,
-      hasCTScanner: fields[5] as bool,
-      phone: fields[6] as String,
+      phone: fields[5] as String,
+      hasScanner: fields[6] as bool,
+      isOpen247: fields[7] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, _$StrokeCenterImpl obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -42,9 +43,11 @@ class StrokeCenterImplAdapter extends TypeAdapter<_$StrokeCenterImpl> {
       ..writeByte(4)
       ..write(obj.longitude)
       ..writeByte(5)
-      ..write(obj.hasCTScanner)
+      ..write(obj.phone)
       ..writeByte(6)
-      ..write(obj.phone);
+      ..write(obj.hasScanner)
+      ..writeByte(7)
+      ..write(obj.isOpen247);
   }
 
   @override
@@ -69,8 +72,9 @@ _$StrokeCenterImpl _$$StrokeCenterImplFromJson(Map<String, dynamic> json) =>
       address: json['address'] as String,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
-      hasCTScanner: json['hasCTScanner'] as bool,
       phone: json['phone'] as String,
+      hasScanner: json['hasScanner'] as bool? ?? false,
+      isOpen247: json['isOpen247'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$$StrokeCenterImplToJson(_$StrokeCenterImpl instance) =>
@@ -80,6 +84,7 @@ Map<String, dynamic> _$$StrokeCenterImplToJson(_$StrokeCenterImpl instance) =>
       'address': instance.address,
       'latitude': instance.latitude,
       'longitude': instance.longitude,
-      'hasCTScanner': instance.hasCTScanner,
       'phone': instance.phone,
+      'hasScanner': instance.hasScanner,
+      'isOpen247': instance.isOpen247,
     };
