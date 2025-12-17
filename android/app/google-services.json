@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "740286725484",
+    "project_id": "agir-vite-v2",
+    "storage_bucket": "agir-vite-v2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:740286725484:android:567e84d95478fb1a818749",
+        "android_client_info": {
+          "package_name": "com.avcespoir.agir_vite"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCF6riNF9Glt6e36q0_jsk0bGV1spB_tFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
