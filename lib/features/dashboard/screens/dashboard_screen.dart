@@ -115,12 +115,12 @@ class DashboardScreen extends ConsumerWidget {
                         _ActionCard(
                           icon: Icons.local_hospital,
                           title: 'Centres\nAVC',
-                          onTap: () {}, // TODO: Nav to Map
+                          onTap: () => context.push('/map'),
                         ),
                         _ActionCard(
-                          icon: Icons.group,
-                          title: 'Cercle de\nVie',
-                          onTap: () {}, // TODO: Nav to Guardians
+                          icon: Icons.play_circle_fill,
+                          title: 'Histoires\n(Vidéos)',
+                          onTap: () => context.push('/stories'),
                         ),
                       ],
                     ),

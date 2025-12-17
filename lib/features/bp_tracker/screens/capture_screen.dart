@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,20 +12,85 @@ class CaptureScreen extends ConsumerStatefulWidget {
   ConsumerState<CaptureScreen> createState() => _CaptureScreenState();
 }
 
-class _CaptureScreenState extends ConsumerState<CaptureScreen> {
+class _CaptureScreenState extends ConsumerState<CaptureScreen> with WidgetsBindingObserver {
+  CameraController? _controller;
   bool _isProcessing = false;
+  bool _isCameraInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _initializeCamera();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Re-initialize camera when app resumes
+    if (_controller == null || !_controller!.value.isInitialized) return;
+    
+    if (state == AppLifecycleState.inactive) {
+      _controller?.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      _initializeCamera();
+    }
+  }
+
+  Future<void> _initializeCamera() async {
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) return;
+
+      // Select back camera
+      final camera = cameras.firstWhere(
+        (c) => c.lensDirection == CameraLensDirection.back,
+        orElse: () => cameras.first,
+      );
+
+      _controller = CameraController(
+        camera,
+        ResolutionPreset.medium,
+        enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.jpeg,
+      );
+
+      await _controller!.initialize();
+      if (mounted) {
+        setState(() => _isCameraInitialized = true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur caméra: $e')),
+        );
+      }
+    }
+  }
 
   Future<void> _captureAndProcess() async {
+    if (_controller == null || !_controller!.value.isInitialized) return;
+    if (_isProcessing) return;
+
     setState(() => _isProcessing = true);
     
     try {
-      // Phase 2: Mock Capture
-      // In real implementation, this would open CameraController
-      final ocrService = ref.read(ocrServiceProvider);
-      final result = await ocrService.extractFromImage('mock_path');
+      final image = await _controller!.takePicture();
       
       if (mounted) {
-        context.push('/bp-tracker/review', extra: result);
+        // Pass the captured file path to the OCR service
+        final ocrService = ref.read(ocrServiceProvider);
+        final result = await ocrService.extractFromImage(image.path);
+        
+        if (mounted) {
+          context.push('/bp-tracker/review', extra: result);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -39,13 +105,20 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_isCameraInitialized || _controller == null) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Camera Placeholder
-          const Center(
-            child: Icon(Icons.camera_alt, color: Colors.white54, size: 100),
+          // Camera Preview
+          Center(
+            child: CameraPreview(_controller!),
           ),
           
           // Overlay Guide
@@ -68,7 +141,11 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
             child: Text(
               'Cadrez l\'écran du tensiomètre',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                shadows: [Shadow(color: Colors.black, blurRadius: 4)],
+              ),
             ),
           ),
           

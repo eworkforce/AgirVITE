@@ -1,7 +1,7 @@
 ---
 title: Product Requirements Document (PRD) - Agir V.I.T.E. 2.0
 version: 2.0.0
-status: Draft
+status: Ready for Review
 author: ONG AVC Espoir & Technical Team
 date: December 2025
 

@@ -1,4 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Camera Permissions -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    
+    <!-- Location Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    
+    <!-- Internet (Default, but good to be explicit for video/maps) -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="agir_vite"
         android:name="${applicationName}"

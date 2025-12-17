@@ -10,6 +10,8 @@ import '../features/onboarding/providers/onboarding_provider.dart';
 import '../features/vite_guide/screens/vite_guide_screen.dart';
 import '../features/bp_tracker/screens/capture_screen.dart';
 import '../features/bp_tracker/screens/review_screen.dart';
+import '../features/stories/screens/stories_feed_screen.dart';
+import '../features/map/screens/centers_list_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final onboardingState = ref.watch(onboardingControllerProvider);
@@ -67,6 +69,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           final extra = state.extra as Map<String, int>;
           return ReviewScreen(extractedData: extra);
         },
+      ),
+      GoRoute(
+        path: '/map',
+        builder: (context, state) => const CentersListScreen(),
+      ),
+      GoRoute(
+        path: '/stories',
+        builder: (context, state) => const StoriesFeedScreen(),
       ),
     ],
   );
