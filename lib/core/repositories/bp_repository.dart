@@ -5,6 +5,7 @@ import '../../data/local/boxes/hive_boxes.dart';
 
 abstract class IBPRepository {
   Future<List<BPReading>> getReadings();
+  Stream<List<BPReading>> watchReadings();
   Future<void> saveReading(BPReading reading);
   Future<void> deleteReading(String id);
 }
@@ -17,6 +18,14 @@ class BPRepository implements IBPRepository {
   @override
   Future<List<BPReading>> getReadings() async {
     return _box.values.toList()..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+  }
+
+  @override
+  Stream<List<BPReading>> watchReadings() async* {
+    yield await getReadings();
+    await for (final _ in _box.watch()) {
+      yield await getReadings();
+    }
   }
 
   @override

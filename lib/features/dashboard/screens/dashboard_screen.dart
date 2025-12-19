@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/theme/colors.dart';
+import '../widgets/bp_status_card.dart';
 import '../../emergency/widgets/sos_button.dart';
-import '../providers/dashboard_provider.dart';
-import '../../../core/services/bp_tracker_service.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final latestReadingAsync = ref.watch(latestBPProvider);
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -63,64 +60,8 @@ class DashboardScreen extends ConsumerWidget {
                   const SizedBox(height: 24),
                   
                   // Status Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: latestReadingAsync.when(
-                          data: (reading) {
-                            if (reading == null) return Colors.grey;
-                            final service = ref.read(bpTrackerServiceProvider);
-                            final status = service.getStatus(reading.systolic, reading.diastolic);
-                            return status.contains('Hypertension') ? AppColors.emergency : AppColors.success;
-                          },
-                          error: (error, stack) => Colors.grey,
-                          loading: () => Colors.grey,
-                        ),
-                        width: 2,
-                      ),
-                    ),
-                    child: latestReadingAsync.when(
-                      data: (reading) {
-                        if (reading == null) {
-                          return Column(
-                            children: [
-                              Text('STATUT ACTUEL', style: Theme.of(context).textTheme.labelSmall),
-                              const SizedBox(height: 8),
-                              Text('--/--', style: Theme.of(context).textTheme.displayMedium),
-                              const Text('Pas encore de mesure'),
-                            ],
-                          );
-                        }
-                        final service = ref.read(bpTrackerServiceProvider);
-                        final status = service.getStatus(reading.systolic, reading.diastolic);
-                        return Column(
-                          children: [
-                            Text('STATUT ACTUEL', style: Theme.of(context).textTheme.labelSmall),
-                            const SizedBox(height: 8),
-                            Text(
-                              '${reading.systolic}/${reading.diastolic}',
-                              style: Theme.of(context).textTheme.displayMedium,
-                            ),
-                            Text(
-                              status,
-                              style: TextStyle(
-                                color: status.contains('Hypertension') 
-                                    ? AppColors.emergency 
-                                    : AppColors.success,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                      loading: () => const Center(child: CircularProgressIndicator()),
-                      error: (err, stack) => Text('Erreur: $err'),
-                    ),
-                  ),
+                  const BPStatusCard(),
+                  
                   const SizedBox(height: 16),
                   
                   // Action Grid

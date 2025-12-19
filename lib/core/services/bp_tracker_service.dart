@@ -19,6 +19,10 @@ class BPTrackerService {
     return _repository.getReadings();
   }
 
+  Stream<List<BPReading>> watchHistory() {
+    return _repository.watchReadings();
+  }
+
   Future<void> addReading({
     required int systolic,
     required int diastolic,
