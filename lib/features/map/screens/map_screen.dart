@@ -420,6 +420,54 @@ class _SideMenu extends StatelessWidget {
               ],
             ),
           ),
+          
+          // Recommendation Card (New)
+          if (selectedCenter == null && currentPosition != null && sortedCenters.isNotEmpty)
+            Builder(
+              builder: (context) {
+                // Find closest (list is already sorted by distance)
+                final closest = sortedCenters.first;
+                return Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withValues(alpha: 0.1),
+                    border: Border.all(color: AppColors.success),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.recommend, color: AppColors.success),
+                          SizedBox(width: 8),
+                          Text("Recommandé", style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      const Text("Le centre le plus proche est :"),
+                      const SizedBox(height: 4),
+                      Text(closest.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.success,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                          ),
+                          onPressed: () => onSelect(closest),
+                          child: const Text("Voir"),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            ),
+
           Expanded(
             child: ListView.separated(
               padding: EdgeInsets.zero,
