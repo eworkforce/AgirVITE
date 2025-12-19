@@ -401,14 +401,21 @@ class _SideMenu extends StatelessWidget {
             color: AppColors.primary,
             child: Row(
               children: [
-                const Icon(Icons.local_hospital, color: Colors.white),
+                Image.asset(
+                  'assets/images/logo_avc_espoir.png',
+                  height: 30,
+                  width: 30,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.local_hospital, color: Colors.white, size: 20),
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
                     'Centres AVC',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

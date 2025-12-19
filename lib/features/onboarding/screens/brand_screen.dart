@@ -33,13 +33,12 @@ class BrandScreen extends ConsumerWidget {
                   ],
                 ),
                 child: Center(
-                  child: Text(
-                    'AVC\nESPOIR',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Image.asset(
+                      'assets/images/logo_avc_espoir.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
               )

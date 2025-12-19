@@ -41,7 +41,18 @@ class _ViteGuideScreenState extends ConsumerState<ViteGuideScreen> with SingleTi
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Guide V.I.T.E.'),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo_avc_espoir.png',
+              height: 30,
+              width: 30,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 12),
+            const Text('Guide V.I.T.E.'),
+          ],
+        ),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,

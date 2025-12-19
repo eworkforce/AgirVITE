@@ -25,19 +25,28 @@ class DashboardScreen extends ConsumerWidget {
                 children: [
                   // Header
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Logo
+                      Image.asset(
+                        'assets/images/logo_avc_espoir.png',
+                        height: 40,
+                        width: 40,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Bonjour,',
-                              style: Theme.of(context).textTheme.headlineMedium,
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             Text(
                               'Votre santé, notre priorité',
-                              style: Theme.of(context).textTheme.bodyMedium,
+                              style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
                         ),
@@ -124,21 +133,25 @@ class DashboardScreen extends ConsumerWidget {
                         _ActionCard(
                           icon: Icons.camera_alt,
                           title: 'Prendre ma\ntension',
+                          imagePath: 'assets/images/PriseTension2.jpeg',
                           onTap: () => context.push('/bp-tracker/capture'),
                         ),
                         _ActionCard(
                           icon: Icons.menu_book,
                           title: 'Guide\nV.I.T.E.',
+                          imagePath: 'assets/images/GuideVite3.jpeg',
                           onTap: () => context.push('/vite-guide'),
                         ),
                         _ActionCard(
                           icon: Icons.local_hospital,
-                          title: 'Centres\nAVC',
+                          title: 'Centre de\nPrise en Charge',
+                          imagePath: 'assets/images/Centre1.jpeg',
                           onTap: () => context.push('/map'),
                         ),
                         _ActionCard(
-                          icon: Icons.play_circle_fill,
-                          title: 'Histoires\n(Vidéos)',
+                          icon: Icons.article,
+                          title: 'News et\nConseils',
+                          imagePath: 'assets/images/Blog1.jpeg',
                           onTap: () => context.push('/stories'),
                         ),
                       ],
@@ -164,11 +177,13 @@ class DashboardScreen extends ConsumerWidget {
 class _ActionCard extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String imagePath;
   final VoidCallback onTap;
 
   const _ActionCard({
     required this.icon,
     required this.title,
+    required this.imagePath,
     required this.onTap,
   });
 
@@ -179,25 +194,77 @@ class _ActionCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
             BoxShadow(
-              color: Colors.black12,
-              blurRadius: 5,
-              offset: Offset(0, 2),
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             )
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Icon(icon, size: 32, color: AppColors.primary),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+            // Background Image with Lightening
+            ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                Colors.white.withValues(alpha: 0.15),
+                BlendMode.lighten,
+              ),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+              ),
+            ),
+            
+            // Subtle Gradient Overlay for Readability
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.0),
+                    Colors.black.withValues(alpha: 0.5),
+                  ],
+                ),
+              ),
+            ),
+            
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 2),
+                    ),
+                    child: Icon(icon, size: 28, color: Colors.white),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        const Shadow(
+                          offset: Offset(0, 1),
+                          blurRadius: 3.0,
+                          color: Colors.black,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
