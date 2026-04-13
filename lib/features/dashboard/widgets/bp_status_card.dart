@@ -14,7 +14,7 @@ class BPStatusCard extends ConsumerWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -44,7 +44,7 @@ class BPStatusCard extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Tension Artérielle',
+                    'Suivez votre tension Artérielle',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
@@ -94,15 +94,17 @@ class BPStatusCard extends ConsumerWidget {
                 ],
               ),
               
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               
               // Chart (Compact)
-              SizedBox(
-                height: 60,
-                child: _buildChart(history, statusColor),
-              ),
+              if (history.length > 1)
+                SizedBox(
+                  height: 50,
+                  child: _buildChart(history, statusColor),
+                ),
               
-              const SizedBox(height: 12),
+              if (history.length > 1)
+                const SizedBox(height: 8),
               
               // Footer (Recommendation)
               Container(
@@ -112,6 +114,7 @@ class BPStatusCard extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Icon(Icons.info_outline, size: 16, color: statusColor),
                     const SizedBox(width: 8),

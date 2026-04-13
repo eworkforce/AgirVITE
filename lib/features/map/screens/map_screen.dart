@@ -429,7 +429,7 @@ class _SideMenu extends StatelessWidget {
           ),
           
           // Recommendation Card (New)
-          if (selectedCenter == null && currentPosition != null && sortedCenters.isNotEmpty)
+          if (currentPosition != null && sortedCenters.isNotEmpty)
             Builder(
               builder: (context) {
                 // Find closest (list is already sorted by distance)

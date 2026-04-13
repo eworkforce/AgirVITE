@@ -46,3 +46,7 @@ app.*.map.json
 
 # YoYo AI version control directory
 .yoyo/
+
+# APK Distribution
+qr-code-download.png
+VITE-App.apk

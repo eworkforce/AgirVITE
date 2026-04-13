@@ -85,8 +85,13 @@ class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProvider
               boxShadow: [
                 BoxShadow(
                   color: AppColors.emergency.withValues(alpha: 0.4),
-                  blurRadius: 10 + (_controller.value * 10),
-                  spreadRadius: 2 + (_controller.value * 5),
+                  blurRadius: 15 + (_controller.value * 15),
+                  spreadRadius: 4 + (_controller.value * 6),
+                ),
+                BoxShadow(
+                  color: AppColors.emergency.withValues(alpha: 0.2),
+                  blurRadius: 25,
+                  spreadRadius: 8,
                 )
               ],
             ),

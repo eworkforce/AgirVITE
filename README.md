@@ -190,6 +190,91 @@ flutter build macos --release
 flutter build linux --release
 ```
 
+### APK Distribution (Testing & Internal Releases)
+
+The project includes an automated APK distribution system using Firebase Storage and QR codes for easy testing.
+
+#### Prerequisites
+- Firebase Storage must be enabled in Firebase Console
+- Google Cloud SDK with `gsutil` installed (optional but recommended)
+- `qrencode` tool installed (already available on Linux Mint)
+
+#### Quick Start
+
+**1. Build the APK:**
+```bash
+flutter build apk --debug
+```
+
+**2. Upload and Generate QR Code:**
+```bash
+./scripts/upload-apk.sh
+```
+
+This script will:
+- Verify the APK exists
+- Rename it to `VITE-App.apk`
+- Upload to Firebase Storage at `apk-releases/VITE-App.apk`
+- Generate a download URL
+- Create a QR code (displayed in terminal + saved as `qr-code-download.png`)
+- Provide installation instructions
+
+**3. Share with Testers:**
+- Show the QR code displayed in the terminal
+- Or share the `qr-code-download.png` file
+- Or share the direct download link
+
+#### For Testers: Installation Instructions
+
+1. **Scan QR Code** with your phone camera or QR code reader
+2. **Download** the APK file (`VITE-App.apk`)
+3. **Enable Installation from Unknown Sources** (if prompted):
+   - Go to Settings > Security > Enable "Unknown Sources"
+   - Or Settings > Apps > Special Access > Install unknown apps > Enable for your browser
+4. **Install** the APK by tapping on the downloaded file
+5. **Launch** VITE App from your app drawer
+
+#### Enabling Firebase Storage (First Time Only)
+
+If Firebase Storage is not enabled:
+
+1. Go to [Firebase Console](https://console.firebase.google.com/project/agir-vite-v2/storage)
+2. Click "Get Started" to enable Firebase Storage
+3. Choose "Start in production mode" (our storage.rules are already configured)
+4. Re-run the deployment: `firebase deploy --only storage`
+5. Run the upload script again: `./scripts/upload-apk.sh`
+
+#### Manual Upload (Alternative Method)
+
+If the automated script fails:
+
+1. Build APK: `flutter build apk --debug`
+2. Go to [Firebase Console Storage](https://console.firebase.google.com/project/agir-vite-v2/storage)
+3. Create folder `apk-releases`
+4. Upload `build/app/outputs/apk/debug/app-debug.apk`
+5. Rename to `VITE-App.apk`
+6. Click on the file and copy the download URL
+7. Generate QR code: `qrencode -o qr-code.png '<YOUR_URL>'`
+
+#### Troubleshooting
+
+**"gsutil not found" error:**
+- Install Google Cloud SDK: https://cloud.google.com/sdk/docs/install
+- Or use the manual upload method above
+
+**"Firebase Storage not enabled" error:**
+- Follow the "Enabling Firebase Storage" instructions above
+
+**APK won't install on phone:**
+- Ensure "Unknown Sources" is enabled
+- Check if sufficient storage space is available
+- Try downloading again if file is corrupted
+
+**QR code won't scan:**
+- Ensure good lighting and steady phone
+- Try scanning the `qr-code-download.png` file instead
+- Or manually type/share the download URL
+
 ## Project Architecture
 
 The project follows a modular architecture pattern:
