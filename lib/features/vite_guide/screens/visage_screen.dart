@@ -170,11 +170,6 @@ class _ImageCrossfadePlaceholderState extends State<_ImageCrossfadePlaceholder> 
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        // Calculate the crossfade opacity based on the animation value (0.0 to 1.0)
-        // 0.0 - 0.4: Normal
-        // 0.4 - 0.5: Fade to Droop
-        // 0.5 - 0.9: Drooping
-        // 0.9 - 1.0: Fade back to Normal
         double droopOpacity = 0.0;
         final value = _controller.value;
         if (value > 0.4 && value <= 0.5) {
@@ -185,20 +180,17 @@ class _ImageCrossfadePlaceholderState extends State<_ImageCrossfadePlaceholder> 
           droopOpacity = 1.0 - ((value - 0.9) * 10);
         }
         
-        // Clamp to ensure it stays between 0.0 and 1.0
         droopOpacity = droopOpacity.clamp(0.0, 1.0);
-        
         final statusColor = Color.lerp(AppColors.primary, AppColors.emergency, droopOpacity)!;
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Image Container
+            // Image Container (Aspect Ratio matched to landscape photos)
             Container(
-              width: 180,
-              height: 180,
+              width: double.infinity,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: statusColor, width: 4),
                 boxShadow: [
                   BoxShadow(
@@ -208,39 +200,42 @@ class _ImageCrossfadePlaceholderState extends State<_ImageCrossfadePlaceholder> 
                   )
                 ],
               ),
-              clipBehavior: Clip.antiAlias,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Base Normal Image
-                  _buildImage('assets/images/visage_normal.jpg'),
-                  
-                  // Droop Image fades over it
-                  Opacity(
-                    opacity: droopOpacity,
-                    child: _buildImage('assets/images/visage_droop.jpg'),
-                  ),
-                  
-                  // Warning icon
-                  if (droopOpacity > 0.8)
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                        ),
-                        child: const Icon(
-                          Icons.warning_rounded,
-                          color: AppColors.emergency,
-                          size: 28,
-                        ),
-                      ).animate().scale(curve: Curves.elasticOut),
+              clipBehavior: Clip.antiAlias, // Ensures the images don't bleed out of the rounded corners
+              child: AspectRatio(
+                aspectRatio: 16 / 9, // Forces the container to be a landscape rectangle perfectly wrapping the image
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Base Normal Image
+                    _buildImage('assets/images/visage_normal.jpg'),
+                    
+                    // Droop Image fades over it
+                    Opacity(
+                      opacity: droopOpacity,
+                      child: _buildImage('assets/images/visage_droop.jpg'),
                     ),
-                ],
+                    
+                    // Warning icon
+                    if (droopOpacity > 0.8)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                          ),
+                          child: const Icon(
+                            Icons.warning_rounded,
+                            color: AppColors.emergency,
+                            size: 28,
+                          ),
+                        ).animate().scale(curve: Curves.elasticOut),
+                      ),
+                  ],
+                ),
               ),
             ),
             
@@ -271,7 +266,7 @@ class _ImageCrossfadePlaceholderState extends State<_ImageCrossfadePlaceholder> 
   Widget _buildImage(String path) {
     return Image.asset(
       path,
-      fit: BoxFit.cover,
+      fit: BoxFit.cover, // Fills the 16:9 AspectRatio container completely edge-to-edge
       errorBuilder: (context, error, stackTrace) {
         // Fallback UI when images are missing
         return Container(
