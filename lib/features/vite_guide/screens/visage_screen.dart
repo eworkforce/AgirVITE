@@ -137,293 +137,159 @@ class VisageScreen extends StatelessWidget {
   }
 
   Widget _buildAnimatedFaceSequence() {
-    // We create a sequence: Normal Face -> Wait -> Drooping Face -> Wait -> Loop
-    return const SizedBox.shrink()
-        .animate(onPlay: (controller) => controller.repeat())
-        .custom(
-          duration: 4.seconds,
-          builder: (context, value, child) {
-            // value goes from 0.0 to 1.0 over 4 seconds
-            // 0.0 - 0.4: Normal
-            // 0.4 - 0.5: Transition
-            // 0.5 - 0.9: Drooping
-            // 0.9 - 1.0: Transition back
-            
-            bool isDrooping = value > 0.4 && value < 0.9;
-            double transition = 0.0;
-            if (value > 0.35 && value <= 0.45) {
-              transition = (value - 0.35) * 10; // 0 to 1
-            } else if (value > 0.85 && value <= 0.95) {
-              transition = 1.0 - ((value - 0.85) * 10); // 1 to 0
-            } else if (isDrooping) {
-              transition = 1.0;
-            }
-            
-            // Clamp value between 0.0 and 1.0 just to be safe
-            transition = transition.clamp(0.0, 1.0);
-            
-            return _FacePlaceholder(droopFactor: transition);
-          },
-        );
+    return const _ImageCrossfadePlaceholder();
   }
 }
 
-class _FacePlaceholder extends StatelessWidget {
-  final double droopFactor; // 0.0 = normal, 1.0 = fully drooping
+class _ImageCrossfadePlaceholder extends StatefulWidget {
+  const _ImageCrossfadePlaceholder();
 
-  const _FacePlaceholder({required this.droopFactor});
+  @override
+  State<_ImageCrossfadePlaceholder> createState() => _ImageCrossfadePlaceholderState();
+}
+
+class _ImageCrossfadePlaceholderState extends State<_ImageCrossfadePlaceholder> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // 4 second loop
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 4));
+    _controller.repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // We use a fixed status color for the warning UI, but the face stays natural
-    final statusColor = Color.lerp(AppColors.primary, AppColors.emergency, droopFactor)!;
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        // Calculate the crossfade opacity based on the animation value (0.0 to 1.0)
+        // 0.0 - 0.4: Normal
+        // 0.4 - 0.5: Fade to Droop
+        // 0.5 - 0.9: Drooping
+        // 0.9 - 1.0: Fade back to Normal
+        double droopOpacity = 0.0;
+        final value = _controller.value;
+        if (value > 0.4 && value <= 0.5) {
+          droopOpacity = (value - 0.4) * 10;
+        } else if (value > 0.5 && value <= 0.9) {
+          droopOpacity = 1.0;
+        } else if (value > 0.9 && value <= 1.0) {
+          droopOpacity = 1.0 - ((value - 0.9) * 10);
+        }
+        
+        // Clamp to ensure it stays between 0.0 and 1.0
+        droopOpacity = droopOpacity.clamp(0.0, 1.0);
+        
+        final statusColor = Color.lerp(AppColors.primary, AppColors.emergency, droopOpacity)!;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Custom Drawn Cartoon Face
-        SizedBox(
-          width: 140,
-          height: 160,
-          child: Stack(
-            clipBehavior: Clip.none,
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Image Container
+            Container(
+              width: 180,
+              height: 180,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: statusColor, width: 4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  )
+                ],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Base Normal Image
+                  _buildImage('assets/images/visage_normal.jpg'),
+                  
+                  // Droop Image fades over it
+                  Opacity(
+                    opacity: droopOpacity,
+                    child: _buildImage('assets/images/visage_droop.jpg'),
+                  ),
+                  
+                  // Warning icon
+                  if (droopOpacity > 0.8)
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                        ),
+                        child: const Icon(
+                          Icons.warning_rounded,
+                          color: AppColors.emergency,
+                          size: 28,
+                        ),
+                      ).animate().scale(curve: Curves.elasticOut),
+                    ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Status pill
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+              ),
+              child: Text(
+                droopOpacity < 0.5 ? 'Sourire symétrique' : 'Affaissement facial !',
+                style: TextStyle(
+                  color: statusColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildImage(String path) {
+    return Image.asset(
+      path,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        // Fallback UI when images are missing
+        return Container(
+          color: Colors.grey[200],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Hair (Back part)
-              Positioned(
-                top: 5,
-                left: 15,
-                right: 15,
-                child: Container(
-                  height: 60,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF2C1E16), // Dark brown/black hair
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50),
-                      topRight: Radius.circular(50),
-                    ),
-                  ),
-                ),
+              const Icon(Icons.image_not_supported, color: Colors.grey, size: 40),
+              const SizedBox(height: 8),
+              Text(
+                'Missing Image:\n$path',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black54, fontSize: 12),
               ),
-              
-              // Main Face Base
-              Positioned(
-                top: 20,
-                left: 20,
-                right: 20,
-                child: Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8D5524), // Warm brown skin tone
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                      topRight: Radius.circular(40),
-                      bottomLeft: Radius.circular(50),
-                      bottomRight: Radius.circular(50),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-
-              // Hair (Front/Textured)
-              Positioned(
-                top: 15,
-                left: 25,
-                right: 25,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(4, (index) => Container(
-                    width: 20,
-                    height: 15,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF2C1E16),
-                      shape: BoxShape.circle,
-                    ),
-                  )),
-                ),
-              ),
-
-              // Left Eye (Normal)
-              Positioned(
-                left: 45,
-                top: 60,
-                child: _buildEye(isDrooping: false),
-              ),
-              
-              // Right Eye (Droops based on factor)
-              Positioned(
-                right: 45,
-                top: 60 + (droopFactor * 10), // Entire eye shifts down slightly
-                child: _buildEye(isDrooping: true, factor: droopFactor),
-              ),
-              
-              // Nose (Subtle)
-              Positioned(
-                top: 85,
-                left: 65,
-                right: 65,
-                child: Container(
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF70431C), // Slightly darker than skin
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-
-              // Mouth
-              Positioned(
-                bottom: 30,
-                left: 40,
-                right: 40,
-                child: SizedBox(
-                  height: 30,
-                  child: CustomPaint(
-                    painter: _CartoonMouthPainter(
-                      droopFactor: droopFactor,
-                    ),
-                  ),
-                ),
-              ),
-              
-              // Warning icon
-              if (droopFactor > 0.8)
-                Positioned(
-                  top: 0,
-                  right: -5,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                    ),
-                    child: const Icon(
-                      Icons.warning_rounded,
-                      color: AppColors.emergency,
-                      size: 32,
-                    ),
-                  ).animate().scale(curve: Curves.elasticOut),
-                ),
             ],
           ),
-        ),
-        const SizedBox(height: 24),
-        // Status pill
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: statusColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: statusColor.withValues(alpha: 0.3)),
-          ),
-          child: Text(
-            droopFactor < 0.5 ? 'Sourire symétrique' : 'Affaissement facial !',
-            style: TextStyle(
-              color: statusColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEye({required bool isDrooping, double factor = 0.0}) {
-    // Eye closes/squints as droop factor increases
-    double eyeHeight = 16.0 - (isDrooping ? factor * 10 : 0);
-    
-    return Container(
-      width: 16,
-      height: 16,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-      ),
-      alignment: Alignment.center,
-      child: Container(
-        width: 8,
-        height: eyeHeight.clamp(2.0, 16.0), // Pupil height changes
-        decoration: BoxDecoration(
-          color: const Color(0xFF2C1E16),
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ),
-    );
-  }
-}
-
-class _CartoonMouthPainter extends CustomPainter {
-  final double droopFactor;
-
-  _CartoonMouthPainter({required this.droopFactor});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Outer Lip (Darker Skin Tone)
-    final lipPaint = Paint()
-      ..color = const Color(0xFF5A3515)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round;
-
-    // Inner Mouth (Dark Red/Black)
-    final mouthFill = Paint()
-      ..color = const Color(0xFF3E1F1F)
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    
-    // Contain the mouth slightly inward to prevent it from looking too wide
-    double startX = size.width * 0.15;
-    double endX = size.width * 0.85;
-    
-    double startY = size.height * 0.4;
-    double midY = size.height * 0.7;
-    // Reduce the extreme drop so it doesn't extend outside the face
-    double endY = size.height * 0.4 + (droopFactor * size.height * 0.5); 
-    
-    // Draw the smile/droop curve
-    path.moveTo(startX, startY);
-    path.quadraticBezierTo(
-      size.width / 2, 
-      midY + (droopFactor * size.height * 0.2), // Middle sags slightly
-      endX, 
-      endY
-    );
-    
-    // If it's a normal smile (low droop), make the mouth slightly open to show happiness
-    if (droopFactor < 0.3) {
-      // Scale down the openness as it starts to droop
-      double openness = 1.0 - (droopFactor / 0.3);
-      
-      final bottomPath = Path()
-        ..moveTo(startX, startY)
-        ..quadraticBezierTo(
-          size.width / 2, 
-          size.height * 0.7 + (openness * size.height * 0.4), // Softer open mouth curve
-          endX, 
-          endY
         );
-      
-      // Fill the open mouth
-      final fullMouth = Path.combine(PathOperation.union, path, bottomPath);
-      canvas.drawPath(fullMouth, mouthFill);
-      canvas.drawPath(bottomPath, lipPaint);
-    }
-
-    // Always draw the top lip line
-    canvas.drawPath(path, lipPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _CartoonMouthPainter oldDelegate) {
-    return oldDelegate.droopFactor != droopFactor;
+      },
+    );
   }
 }
