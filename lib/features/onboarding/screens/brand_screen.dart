@@ -84,9 +84,9 @@ class BrandScreen extends ConsumerWidget {
 
             // Slogan
             Text(
-              "Pour sauver des Vies,\n"
-              "évitons l'AVC,\n"
-              "S'informer, prévenir et agir.",
+            "Agir, s'informer, prévenir.\n"  
+            "Pour sauver des Vies,\n"
+              "évitons l'AVC.\n",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w500,
