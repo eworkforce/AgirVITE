@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../app/theme/colors.dart';
@@ -320,13 +321,20 @@ class _BodyPainter extends CustomPainter {
     final endLeftElbow = Offset(leftShoulderX - armLength * 0.2, leftShoulderY + armLength * 0.5);
     final endLeftHand = Offset(leftShoulderX - armLength * 0.1, leftShoulderY + armLength * 0.9);
 
-    // Interpolate positions
+    // Calculate a shake offset that is active only while the arm is dropping
+    double shakeX = 0.0;
+    if (dropFactor > 0.0 && dropFactor < 1.0) {
+      // sin(dropFactor * pi * N) creates N/2 shakes during the fall.
+      shakeX = sin(dropFactor * pi * 8) * 15.0; // 15 pixels max horizontal shake
+    }
+
+    // Interpolate positions with shake
     final currentLeftElbow = Offset(
-      startLeftElbow.dx + (endLeftElbow.dx - startLeftElbow.dx) * dropFactor,
+      startLeftElbow.dx + (endLeftElbow.dx - startLeftElbow.dx) * dropFactor + shakeX,
       startLeftElbow.dy + (endLeftElbow.dy - startLeftElbow.dy) * dropFactor,
     );
     final currentLeftHand = Offset(
-      startLeftHand.dx + (endLeftHand.dx - startLeftHand.dx) * dropFactor,
+      startLeftHand.dx + (endLeftHand.dx - startLeftHand.dx) * dropFactor + (shakeX * 1.5), // Hand shakes slightly more
       startLeftHand.dy + (endLeftHand.dy - startLeftHand.dy) * dropFactor,
     );
 
