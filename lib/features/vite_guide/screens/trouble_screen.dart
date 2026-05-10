@@ -167,36 +167,34 @@ class _CodeAnimatedSpeechState extends State<_CodeAnimatedSpeech> with SingleTic
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // The Custom Painter Canvas with Alarm Background
-            Container(
+            // The Custom Painter Canvas with Danger Icon
+            SizedBox(
               width: 180,
               height: 180,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: troubleOpacity > 0.2 
-                    ? AppColors.emergency.withValues(alpha: 0.15 * troubleOpacity)
-                    : Colors.transparent,
-                boxShadow: troubleOpacity > 0.5 
-                    ? [
-                        BoxShadow(
-                          color: AppColors.emergency.withValues(alpha: 0.2 * troubleOpacity),
-                          blurRadius: 20 * troubleOpacity,
-                          spreadRadius: 10 * troubleOpacity,
-                        )
-                      ]
-                    : [],
-              ),
-              child: Center(
-                child: SizedBox(
-                  width: 160,
-                  height: 160,
-                  child: CustomPaint(
-                    painter: _SpeechPainter(
-                      troubleFactor: troubleOpacity,
-                      animationValue: value,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 160,
+                    height: 160,
+                    child: CustomPaint(
+                      painter: _SpeechPainter(
+                        troubleFactor: troubleOpacity,
+                        animationValue: value,
+                      ),
                     ),
                   ),
-                ),
+                  if (troubleOpacity > 0.5)
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: const Icon(
+                        Icons.warning_rounded,
+                        color: Colors.red,
+                        size: 36,
+                      ).animate().scale(curve: Curves.elasticOut),
+                    ),
+                ],
               ),
             ),
             

@@ -166,33 +166,31 @@ class _CodeAnimatedFaceState extends State<_CodeAnimatedFace> with SingleTickerP
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // The Custom Painter Canvas with Alarm Background
-            Container(
+            // The Custom Painter Canvas with Danger Icon
+            SizedBox(
               width: 180,
               height: 180,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: droopOpacity > 0.2 
-                    ? AppColors.emergency.withValues(alpha: 0.15 * droopOpacity)
-                    : Colors.transparent,
-                boxShadow: droopOpacity > 0.5 
-                    ? [
-                        BoxShadow(
-                          color: AppColors.emergency.withValues(alpha: 0.2 * droopOpacity),
-                          blurRadius: 20 * droopOpacity,
-                          spreadRadius: 10 * droopOpacity,
-                        )
-                      ]
-                    : [],
-              ),
-              child: Center(
-                child: SizedBox(
-                  width: 160,
-                  height: 160,
-                  child: CustomPaint(
-                    painter: _FacePainter(droopFactor: droopOpacity),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 160,
+                    height: 160,
+                    child: CustomPaint(
+                      painter: _FacePainter(droopFactor: droopOpacity),
+                    ),
                   ),
-                ),
+                  if (droopOpacity > 0.5)
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: const Icon(
+                        Icons.warning_rounded,
+                        color: Colors.red,
+                        size: 36,
+                      ).animate().scale(curve: Curves.elasticOut),
+                    ),
+                ],
               ),
             ),
             
