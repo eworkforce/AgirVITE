@@ -8,7 +8,8 @@ import 'trouble_screen.dart';
 import 'en_urgence_screen.dart';
 
 class ViteGuideScreen extends ConsumerStatefulWidget {
-  const ViteGuideScreen({super.key});
+  final int initialIndex;
+  const ViteGuideScreen({super.key, this.initialIndex = 0});
 
   @override
   ConsumerState<ViteGuideScreen> createState() => _ViteGuideScreenState();
@@ -20,7 +21,7 @@ class _ViteGuideScreenState extends ConsumerState<ViteGuideScreen> with SingleTi
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: widget.initialIndex);
   }
 
   @override

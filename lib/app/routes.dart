@@ -79,7 +79,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/vite-guide',
-            builder: (context, state) => const ViteGuideScreen(),
+            builder: (context, state) {
+              final initialIndex = state.extra as int? ?? 0;
+              return ViteGuideScreen(initialIndex: initialIndex);
+            },
           ),
           GoRoute(
             path: '/bp-tracker',

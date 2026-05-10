@@ -119,10 +119,7 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   void _goToViteTab(BuildContext context, int index) {
-    // Navigate to vite-guide and pass the index if your routing supports it, 
-    // or just push the guide. For now, pushing the guide.
-    // If you update ViteGuideScreen to accept an initial index, you can pass it here.
-    context.push('/vite-guide'); 
+    context.push('/vite-guide', extra: index); 
   }
 }
 
