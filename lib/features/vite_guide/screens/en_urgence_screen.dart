@@ -48,6 +48,30 @@ class EnUrgenceScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
             ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.emergency.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.emergency.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.timer_outlined, color: AppColors.emergency, size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Chaque minute compte. Il existe une fenêtre thérapeutique critique de 4 heures maximum pour agir et éviter des séquelles irréversibles.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.textPrimary,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
