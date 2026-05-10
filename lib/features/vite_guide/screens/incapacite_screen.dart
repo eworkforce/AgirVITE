@@ -227,52 +227,100 @@ class _BodyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final paint = Paint()
+    
+    // Draw Torso (Shirt)
+    final torsoPaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.fill;
+    
+    final torsoWidth = size.width * 0.45;
+    final torsoHeight = size.height * 0.4;
+    final torsoTopY = center.dy - size.height * 0.1;
+    
+    final torsoRect = RRect.fromRectAndCorners(
+      Rect.fromCenter(
+        center: Offset(center.dx, torsoTopY + torsoHeight / 2),
+        width: torsoWidth,
+        height: torsoHeight,
+      ),
+      topLeft: const Radius.circular(16),
+      topRight: const Radius.circular(16),
+      bottomLeft: const Radius.circular(4),
+      bottomRight: const Radius.circular(4),
+    );
+    canvas.drawRRect(torsoRect, torsoPaint);
+
+    // Draw Head
+    final skinPaint = Paint()
+      ..color = const Color(0xFFFFD1B3) // Simple skin tone
+      ..style = PaintingStyle.fill;
+      
+    final headRadius = size.width * 0.18;
+    final headCenter = Offset(center.dx, torsoTopY - headRadius * 1.1);
+    canvas.drawCircle(headCenter, headRadius, skinPaint);
+    
+    // Draw Hair (Simple shape)
+    final hairPaint = Paint()
+      ..color = const Color(0xFF3E2723) // Dark brown
+      ..style = PaintingStyle.fill;
+    
+    Path hairPath = Path();
+    hairPath.moveTo(headCenter.dx - headRadius, headCenter.dy);
+    hairPath.quadraticBezierTo(headCenter.dx - headRadius, headCenter.dy - headRadius * 1.2, headCenter.dx, headCenter.dy - headRadius * 1.2);
+    hairPath.quadraticBezierTo(headCenter.dx + headRadius, headCenter.dy - headRadius * 1.2, headCenter.dx + headRadius, headCenter.dy);
+    hairPath.quadraticBezierTo(headCenter.dx, headCenter.dy - headRadius * 0.5, headCenter.dx - headRadius, headCenter.dy);
+    canvas.drawPath(hairPath, hairPaint);
+
+    // Arms
+    final armWidth = size.width * 0.12;
+    final armLength = size.height * 0.35;
+    final shoulderDrop = torsoHeight * 0.1;
+    
+    // Right Arm (Viewer's right, stays up)
+    final rightShoulderX = center.dx + torsoWidth / 2;
+    final rightShoulderY = torsoTopY + shoulderDrop;
+    
+    final rightArmPaint = Paint()
+      ..color = skinPaint.color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = armWidth
+      ..strokeCap = StrokeCap.round;
+      
+    // Sleeve
+    final sleevePaint = Paint()
       ..color = AppColors.primary
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 8
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
+      ..strokeWidth = armWidth
+      ..strokeCap = StrokeCap.round;
 
-    final headRadius = size.height * 0.15;
-    final headCenter = Offset(center.dx, center.dy - size.height * 0.25);
-    
-    // Draw Head
-    canvas.drawCircle(headCenter, headRadius, paint);
-
-    // Draw Torso
-    final neckY = headCenter.dy + headRadius;
-    final waistY = center.dy + size.height * 0.25;
-    canvas.drawLine(Offset(center.dx, neckY), Offset(center.dx, waistY), paint);
-
-    // Draw Right Arm (User's left, viewer's right - stays up)
-    final shouldersY = neckY + 10;
-    final armLength = size.width * 0.35;
-    
-    // Right arm raised
-    final rightElbow = Offset(center.dx + armLength * 0.6, shouldersY - armLength * 0.2);
-    final rightHand = Offset(rightElbow.dx + armLength * 0.4, rightElbow.dy - armLength * 0.4);
-    
+    // Draw right arm raised
     Path rightArmPath = Path();
-    rightArmPath.moveTo(center.dx, shouldersY);
-    rightArmPath.lineTo(rightElbow.dx, rightElbow.dy);
-    rightArmPath.lineTo(rightHand.dx, rightHand.dy);
-    canvas.drawPath(rightArmPath, paint);
-
-    // Draw Left Arm (User's right, viewer's left - drops down)
-    // Calculate angle based on dropFactor. 
-    // Raised angle approx -30 degrees from horizontal (-pi/6). Dropped angle approx 70 degrees from horizontal (pi/3).
-    // Using simple rotation around the shoulder point.
+    rightArmPath.moveTo(rightShoulderX, rightShoulderY);
+    rightArmPath.lineTo(rightShoulderX + armLength * 0.5, rightShoulderY - armLength * 0.6);
+    rightArmPath.lineTo(rightShoulderX + armLength * 0.2, rightShoulderY - armLength * 1.1);
     
-    // Starting raised position (mirrored from right arm)
-    final startLeftElbow = Offset(center.dx - armLength * 0.6, shouldersY - armLength * 0.2);
-    final startLeftHand = Offset(startLeftElbow.dx - armLength * 0.4, startLeftElbow.dy - armLength * 0.4);
+    canvas.drawPath(rightArmPath, rightArmPaint);
     
-    // Target dropped position
-    final endLeftElbow = Offset(center.dx - armLength * 0.3, shouldersY + armLength * 0.5);
-    final endLeftHand = Offset(endLeftElbow.dx - armLength * 0.1, endLeftElbow.dy + armLength * 0.5);
+    // Draw right sleeve
+    canvas.drawLine(
+      Offset(rightShoulderX, rightShoulderY),
+      Offset(rightShoulderX + armLength * 0.25, rightShoulderY - armLength * 0.3),
+      sleevePaint
+    );
 
-    // Interpolate positions based on dropFactor
+    // Left Arm (Viewer's left, drops down)
+    final leftShoulderX = center.dx - torsoWidth / 2;
+    final leftShoulderY = torsoTopY + shoulderDrop;
+    
+    // Start position (raised, mirrored from right)
+    final startLeftElbow = Offset(leftShoulderX - armLength * 0.5, leftShoulderY - armLength * 0.6);
+    final startLeftHand = Offset(leftShoulderX - armLength * 0.2, leftShoulderY - armLength * 1.1);
+    
+    // Target position (dropped to the side)
+    final endLeftElbow = Offset(leftShoulderX - armLength * 0.2, leftShoulderY + armLength * 0.5);
+    final endLeftHand = Offset(leftShoulderX - armLength * 0.1, leftShoulderY + armLength * 0.9);
+
+    // Interpolate positions
     final currentLeftElbow = Offset(
       startLeftElbow.dx + (endLeftElbow.dx - startLeftElbow.dx) * dropFactor,
       startLeftElbow.dy + (endLeftElbow.dy - startLeftElbow.dy) * dropFactor,
@@ -283,19 +331,51 @@ class _BodyPainter extends CustomPainter {
     );
 
     Path leftArmPath = Path();
-    leftArmPath.moveTo(center.dx, shouldersY);
+    leftArmPath.moveTo(leftShoulderX, leftShoulderY);
     leftArmPath.lineTo(currentLeftElbow.dx, currentLeftElbow.dy);
     leftArmPath.lineTo(currentLeftHand.dx, currentLeftHand.dy);
     
-    // Draw the dropping arm with potentially changing color to highlight the issue
-    final armPaint = Paint()
-      ..color = Color.lerp(AppColors.primary, AppColors.emergency, dropFactor)!
+    // The left arm changes color to indicate the issue as it drops
+    final leftArmPaint = Paint()
+      ..color = Color.lerp(skinPaint.color, AppColors.emergency.withValues(alpha: 0.5), dropFactor)!
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 8
+      ..strokeWidth = armWidth
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    canvas.drawPath(leftArmPath, armPaint);
+    canvas.drawPath(leftArmPath, leftArmPaint);
+    
+    // Draw left sleeve (interpolated)
+    final currentSleeveEnd = Offset(
+      leftShoulderX + (currentLeftElbow.dx - leftShoulderX) * 0.5,
+      leftShoulderY + (currentLeftElbow.dy - leftShoulderY) * 0.5,
+    );
+    canvas.drawLine(
+      Offset(leftShoulderX, leftShoulderY),
+      currentSleeveEnd,
+      sleevePaint
+    );
+    
+    // Add downward motion arrows if dropping
+    if (dropFactor > 0.1 && dropFactor < 0.9) {
+      final arrowPaint = Paint()
+        ..color = AppColors.emergency
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round;
+        
+      final arrowX = leftShoulderX - armLength * 0.8;
+      final arrowY = leftShoulderY - armLength * 0.2 + (armLength * dropFactor);
+      
+      Path arrowPath = Path();
+      arrowPath.moveTo(arrowX, arrowY);
+      arrowPath.lineTo(arrowX, arrowY + 15);
+      arrowPath.moveTo(arrowX - 5, arrowY + 10);
+      arrowPath.lineTo(arrowX, arrowY + 15);
+      arrowPath.lineTo(arrowX + 5, arrowY + 10);
+      
+      canvas.drawPath(arrowPath, arrowPaint);
+    }
   }
 
   @override

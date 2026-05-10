@@ -224,78 +224,141 @@ class _CodeAnimatedSpeechState extends State<_CodeAnimatedSpeech> with SingleTic
 }
 
 class _SpeechPainter extends CustomPainter {
-  final double troubleFactor; // 0.0 = smooth wave, 1.0 = jagged scribble
-  final double animationValue; // For continuous wave movement
+  final double troubleFactor; // 0.0 = clear speech, 1.0 = confused speech
+  final double animationValue; // For continuous movement
 
   _SpeechPainter({required this.troubleFactor, required this.animationValue});
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Draw stylized person profile on the left
+    final center = Offset(size.width / 2, size.height / 2);
+    
+    // Draw person profile (chest and head)
     final profilePaint = Paint()
       ..color = AppColors.primary
       ..style = PaintingStyle.fill;
       
-    Path profilePath = Path();
-    profilePath.moveTo(size.width * 0.1, size.height * 0.8);
-    profilePath.quadraticBezierTo(size.width * 0.2, size.height * 0.6, size.width * 0.2, size.height * 0.4);
-    profilePath.arcToPoint(Offset(size.width * 0.4, size.height * 0.4), radius: Radius.circular(size.width * 0.1), clockwise: true);
-    profilePath.quadraticBezierTo(size.width * 0.4, size.height * 0.6, size.width * 0.3, size.height * 0.8);
-    profilePath.close();
-    canvas.drawPath(profilePath, profilePaint);
+    // Body (Shirt)
+    Path bodyPath = Path();
+    bodyPath.moveTo(center.dx - size.width * 0.25, size.height * 0.9);
+    bodyPath.quadraticBezierTo(center.dx, size.height * 0.7, center.dx + size.width * 0.25, size.height * 0.9);
+    bodyPath.lineTo(center.dx + size.width * 0.25, size.height);
+    bodyPath.lineTo(center.dx - size.width * 0.25, size.height);
+    bodyPath.close();
+    canvas.drawPath(bodyPath, profilePaint);
 
-    // Speech Bubble Background
-    final bubblePaint = Paint()
-      ..color = AppColors.background
+    // Head
+    final skinPaint = Paint()
+      ..color = const Color(0xFFFFD1B3) // Skin tone
+      ..style = PaintingStyle.fill;
+      
+    final headRadius = size.width * 0.16;
+    final headCenter = Offset(center.dx, center.dy + size.height * 0.05);
+    canvas.drawCircle(headCenter, headRadius, skinPaint);
+    
+    // Hair
+    final hairPaint = Paint()
+      ..color = const Color(0xFF3E2723)
       ..style = PaintingStyle.fill;
     
+    Path hairPath = Path();
+    hairPath.moveTo(headCenter.dx - headRadius, headCenter.dy);
+    hairPath.quadraticBezierTo(headCenter.dx - headRadius, headCenter.dy - headRadius * 1.2, headCenter.dx, headCenter.dy - headRadius * 1.2);
+    hairPath.quadraticBezierTo(headCenter.dx + headRadius, headCenter.dy - headRadius * 1.2, headCenter.dx + headRadius, headCenter.dy);
+    hairPath.quadraticBezierTo(headCenter.dx, headCenter.dy - headRadius * 0.5, headCenter.dx - headRadius, headCenter.dy);
+    canvas.drawPath(hairPath, hairPaint);
+
+    // Speech Bubble
+    final bubbleRect = Rect.fromLTRB(
+      center.dx + size.width * 0.05, 
+      center.dy - size.height * 0.4, 
+      center.dx + size.width * 0.45, 
+      center.dy - size.height * 0.1
+    );
+    
+    final bubblePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+      
     final bubbleOutlinePaint = Paint()
-      ..color = Color.lerp(AppColors.primary.withValues(alpha: 0.3), AppColors.emergency.withValues(alpha: 0.5), troubleFactor)!
+      ..color = Color.lerp(AppColors.primary, AppColors.emergency, troubleFactor)!
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
 
-    final bubbleRect = Rect.fromLTRB(size.width * 0.3, size.height * 0.2, size.width * 0.95, size.height * 0.7);
     final bubbleRRect = RRect.fromRectAndRadius(bubbleRect, const Radius.circular(16));
-    
     canvas.drawRRect(bubbleRRect, bubblePaint);
     canvas.drawRRect(bubbleRRect, bubbleOutlinePaint);
-
-    // Draw Sound Wave / Text inside bubble
-    final wavePaint = Paint()
-      ..color = Color.lerp(AppColors.primary, AppColors.emergency, troubleFactor)!
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final waveCenterY = bubbleRect.center.dy;
-    final waveStartX = bubbleRect.left + 15;
-    final waveWidth = bubbleRect.width - 30;
     
-    Path wavePath = Path();
-    wavePath.moveTo(waveStartX, waveCenterY);
-
-    // Generate wave points
-    const int segments = 50;
-    final double phaseShift = animationValue * 2 * pi * 4; // Moves the wave
+    // Bubble Tail
+    Path tailPath = Path();
+    tailPath.moveTo(bubbleRect.left + 15, bubbleRect.bottom);
+    tailPath.lineTo(bubbleRect.left + 5, bubbleRect.bottom + 15);
+    tailPath.lineTo(bubbleRect.left + 25, bubbleRect.bottom);
+    canvas.drawPath(tailPath, bubblePaint);
     
-    for (int i = 1; i <= segments; i++) {
-      double t = i / segments;
-      double x = waveStartX + (waveWidth * t);
+    // Draw the outline of the tail, skipping the top edge where it connects
+    Path tailOutlinePath = Path();
+    tailOutlinePath.moveTo(bubbleRect.left + 15, bubbleRect.bottom);
+    tailOutlinePath.lineTo(bubbleRect.left + 5, bubbleRect.bottom + 15);
+    tailOutlinePath.lineTo(bubbleRect.left + 25, bubbleRect.bottom);
+    canvas.drawPath(tailOutlinePath, bubbleOutlinePaint);
+
+    // Draw content inside the bubble
+    // We'll draw 3 clear dots initially, morphing into a large red question mark and scrambled lines
+    final contentCenter = bubbleRect.center;
+    
+    if (troubleFactor < 0.5) {
+      // Clear speech: 3 dots (ellipsis) animating up and down
+      final dotPaint = Paint()
+        ..color = AppColors.primary
+        ..style = PaintingStyle.fill;
+        
+      final offset1 = sin(animationValue * 2 * pi * 4) * 3;
+      final offset2 = sin(animationValue * 2 * pi * 4 + pi/2) * 3;
+      final offset3 = sin(animationValue * 2 * pi * 4 + pi) * 3;
       
-      // Smooth sine wave
-      double smoothY = sin((t * 2 * pi * 2) - phaseShift) * 15;
+      canvas.drawCircle(Offset(contentCenter.dx - 12, contentCenter.dy + offset1), 4, dotPaint);
+      canvas.drawCircle(Offset(contentCenter.dx, contentCenter.dy + offset2), 4, dotPaint);
+      canvas.drawCircle(Offset(contentCenter.dx + 12, contentCenter.dy + offset3), 4, dotPaint);
+    } else {
+      // Troubled speech: A red question mark and scrambled lines
+      final troublePaint = Paint()
+        ..color = AppColors.emergency
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
+        
+      // Draw "?"
+      TextSpan span = TextSpan(
+        style: TextStyle(
+          color: AppColors.emergency,
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+        ),
+        text: '?',
+      );
+      TextPainter tp = TextPainter(
+        text: span,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      );
+      tp.layout();
+      tp.paint(canvas, Offset(contentCenter.dx - tp.width/2, contentCenter.dy - tp.height/2));
       
-      // Jagged noise based on x and time
-      double noise = (sin(i * 12.3 + phaseShift * 2) * cos(i * 7.1) * 25);
+      // Draw jagged line showing confusion
+      Path jaggedPath = Path();
+      jaggedPath.moveTo(bubbleRect.left + 10, bubbleRect.bottom - 10);
       
-      // Interpolate between smooth and jagged based on troubleFactor
-      double y = waveCenterY + (smoothY * (1 - troubleFactor)) + (noise * troubleFactor);
+      // Animate the jaggedness
+      final noiseOffset = sin(animationValue * 2 * pi * 10) * 5;
       
-      wavePath.lineTo(x, y);
+      jaggedPath.lineTo(bubbleRect.left + 20, bubbleRect.top + 20 + noiseOffset);
+      jaggedPath.lineTo(bubbleRect.right - 20, bubbleRect.bottom - 15 - noiseOffset);
+      jaggedPath.lineTo(bubbleRect.right - 10, bubbleRect.top + 10 + noiseOffset);
+      
+      canvas.drawPath(jaggedPath, troublePaint..color = AppColors.emergency.withValues(alpha: 0.5));
     }
-
-    canvas.drawPath(wavePath, wavePaint);
   }
 
   @override
