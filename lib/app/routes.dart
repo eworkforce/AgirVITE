@@ -10,9 +10,11 @@ import '../features/onboarding/providers/onboarding_provider.dart';
 import '../features/vite_guide/screens/vite_guide_screen.dart';
 import '../features/bp_tracker/screens/capture_screen.dart';
 import '../features/bp_tracker/screens/review_screen.dart';
+import '../features/bp_tracker/screens/bp_hub_screen.dart';
 import '../features/stories/screens/stories_feed_screen.dart';
 import '../features/map/screens/map_screen.dart';
 import '../features/profile/screens/profile_screen.dart';
+import 'widgets/main_shell.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final onboardingState = ref.watch(onboardingControllerProvider);
@@ -65,36 +67,48 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/onboarding/profile',
         builder: (context, state) => const ProfileSetupScreen(),
       ),
-      GoRoute(
-        path: '/dashboard',
-        builder: (context, state) => const DashboardScreen(),
-      ),
-      GoRoute(
-        path: '/vite-guide',
-        builder: (context, state) => const ViteGuideScreen(),
-      ),
-      GoRoute(
-        path: '/bp-tracker/capture',
-        builder: (context, state) => const CaptureScreen(),
-      ),
-      GoRoute(
-        path: '/bp-tracker/review',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, int>;
-          return ReviewScreen(extractedData: extra);
+      // Main shell wrapped routes
+      ShellRoute(
+        builder: (context, state, child) {
+          return MainShell(child: child);
         },
-      ),
-      GoRoute(
-        path: '/map',
-        builder: (context, state) => const MapScreen(),
-      ),
-      GoRoute(
-        path: '/stories',
-        builder: (context, state) => const StoriesFeedScreen(),
-      ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
+        routes: [
+          GoRoute(
+            path: '/dashboard',
+            builder: (context, state) => const DashboardScreen(),
+          ),
+          GoRoute(
+            path: '/vite-guide',
+            builder: (context, state) => const ViteGuideScreen(),
+          ),
+          GoRoute(
+            path: '/bp-tracker',
+            builder: (context, state) => const BPHubScreen(),
+          ),
+          GoRoute(
+            path: '/bp-tracker/capture',
+            builder: (context, state) => const CaptureScreen(),
+          ),
+          GoRoute(
+            path: '/bp-tracker/review',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, int>;
+              return ReviewScreen(extractedData: extra);
+            },
+          ),
+          GoRoute(
+            path: '/map',
+            builder: (context, state) => const MapScreen(),
+          ),
+          GoRoute(
+            path: '/stories',
+            builder: (context, state) => const StoriesFeedScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+        ],
       ),
     ],
   );

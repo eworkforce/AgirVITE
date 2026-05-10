@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/theme/colors.dart';
 import '../../profile/providers/profile_provider.dart';
-import '../widgets/bp_status_card.dart';
-import '../../emergency/widgets/sos_button.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -22,8 +20,6 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      floatingActionButton: const SOSButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -54,7 +50,7 @@ class DashboardScreen extends ConsumerWidget {
                               ),
                         ),
                         Text(
-                          'Votre santé, notre priorité',
+                          'Reconnaître les signes d\'un AVC',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -75,43 +71,42 @@ class DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               
-              // Status Card
-              const BPStatusCard(),
-              
-              const SizedBox(height: 16),
-              
-              // Action Grid
+              // Action Grid (V.I.T.E.)
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                   childAspectRatio: 0.95,
-                  padding: const EdgeInsets.only(bottom: 100), // Increased padding to avoid SOS overlap
+                  padding: const EdgeInsets.only(bottom: 24),
                   children: [
-                    _ActionCard(
-                      icon: Icons.camera_alt,
-                      title: 'Prendre ma\ntension',
-                      imagePath: 'assets/images/PriseTension2.jpeg',
-                      onTap: () => context.push('/bp-tracker/capture'),
+                    _ViteCard(
+                      letter: 'V',
+                      title: 'Visage\nParalysé',
+                      color: AppColors.secondary,
+                      icon: Icons.face,
+                      onTap: () => _goToViteTab(context, 0),
                     ),
-                    _ActionCard(
-                      icon: Icons.menu_book,
-                      title: 'Guide\nV.I.T.E.',
-                      imagePath: 'assets/images/GuideVite3.jpeg',
-                      onTap: () => context.push('/vite-guide'),
+                    _ViteCard(
+                      letter: 'I',
+                      title: 'Incapacité\nMembre faible',
+                      color: AppColors.primary, // Switched to primary since accentBlue doesn't exist
+                      icon: Icons.accessible_forward,
+                      onTap: () => _goToViteTab(context, 1),
                     ),
-                    _ActionCard(
-                      icon: Icons.local_hospital,
-                      title: 'Centre de\nPrise en Charge',
-                      imagePath: 'assets/images/Centre1.jpeg',
-                      onTap: () => context.push('/map'),
+                    _ViteCard(
+                      letter: 'T',
+                      title: 'Trouble\nde la parole',
+                      color: AppColors.warning, // Switched to warning since tertiary doesn't exist
+                      icon: Icons.record_voice_over,
+                      onTap: () => _goToViteTab(context, 2),
                     ),
-                    _ActionCard(
-                      icon: Icons.article,
-                      title: 'News et\nConseils',
-                      imagePath: 'assets/images/Blog1.jpeg',
-                      onTap: () => context.push('/stories'),
+                    _ViteCard(
+                      letter: 'E',
+                      title: 'En Urgence\nAgir vite!',
+                      color: AppColors.emergency, // Switched to emergency since error doesn't exist
+                      icon: Icons.timer,
+                      onTap: () => _goToViteTab(context, 3),
                     ),
                   ],
                 ),
@@ -122,18 +117,27 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _goToViteTab(BuildContext context, int index) {
+    // Navigate to vite-guide and pass the index if your routing supports it, 
+    // or just push the guide. For now, pushing the guide.
+    // If you update ViteGuideScreen to accept an initial index, you can pass it here.
+    context.push('/vite-guide'); 
+  }
 }
 
-class _ActionCard extends StatelessWidget {
-  final IconData icon;
+class _ViteCard extends StatelessWidget {
+  final String letter;
   final String title;
-  final String imagePath;
+  final Color color;
+  final IconData icon;
   final VoidCallback onTap;
 
-  const _ActionCard({
-    required this.icon,
+  const _ViteCard({
+    required this.letter,
     required this.title,
-    required this.imagePath,
+    required this.color,
+    required this.icon,
     required this.onTap,
   });
 
@@ -145,78 +149,40 @@ class _ActionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: color.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             )
           ],
         ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          fit: StackFit.expand,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Background Image (without ColorFiltered)
-            Image.asset(
-              imagePath,
-              fit: BoxFit.cover,
-            ),
-            
-            // Gradient Overlay for Readability (Scrim)
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.center,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.0),
-                    Colors.black.withValues(alpha: 0.8),
-                  ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  letter,
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w900,
+                    height: 1.0,
+                  ),
                 ),
-              ),
+                Icon(icon, color: color.withValues(alpha: 0.6), size: 32),
+              ],
             ),
-            
-            // Icon at Top Right
-            Positioned(
-              top: 12,
-              right: 12,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.4), // Dark translucent background for contrast
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    )
-                  ],
-                ),
-                child: Icon(icon, size: 24, color: Colors.white),
-              ),
-            ),
-            
-            // Content at Bottom Left
-            Positioned(
-              bottom: 16,
-              left: 16,
-              right: 16,
-              child: Text(
-                title,
-                textAlign: TextAlign.left,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    const Shadow(
-                      offset: Offset(0, 1),
-                      blurRadius: 4.0,
-                      color: Colors.black54,
-                    ),
-                  ],
-                ),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
