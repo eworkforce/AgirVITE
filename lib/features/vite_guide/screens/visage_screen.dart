@@ -33,7 +33,7 @@ class VisageScreen extends StatelessWidget {
             
             const SizedBox(height: 24),
             
-            // Animated Visual Placeholder (Simulating the Rive animation)
+            // Code-Generated Animation Visual
             Container(
               height: 280,
               width: double.infinity,
@@ -49,24 +49,7 @@ class VisageScreen extends StatelessWidget {
                   )
                 ],
               ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Background decorative circle
-                  Container(
-                    width: 180,
-                    height: 180,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.background,
-                    ),
-                  ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                   .scale(begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05), duration: 2.seconds, curve: Curves.easeInOut),
-                   
-                  // Face changing states
-                  _buildAnimatedFaceSequence(),
-                ],
-              ),
+              child: const _CodeAnimatedFace(),
             ).animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.9, 0.9)),
 
             const SizedBox(height: 24),
@@ -135,20 +118,16 @@ class VisageScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildAnimatedFaceSequence() {
-    return const _ImageCrossfadePlaceholder();
-  }
 }
 
-class _ImageCrossfadePlaceholder extends StatefulWidget {
-  const _ImageCrossfadePlaceholder();
+class _CodeAnimatedFace extends StatefulWidget {
+  const _CodeAnimatedFace();
 
   @override
-  State<_ImageCrossfadePlaceholder> createState() => _ImageCrossfadePlaceholderState();
+  State<_CodeAnimatedFace> createState() => _CodeAnimatedFaceState();
 }
 
-class _ImageCrossfadePlaceholderState extends State<_ImageCrossfadePlaceholder> with SingleTickerProviderStateMixin {
+class _CodeAnimatedFaceState extends State<_CodeAnimatedFace> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -185,57 +164,14 @@ class _ImageCrossfadePlaceholderState extends State<_ImageCrossfadePlaceholder> 
 
         return Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Image Container (Aspect Ratio matched to landscape photos)
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: statusColor, width: 4),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  )
-                ],
-              ),
-              clipBehavior: Clip.antiAlias, // Ensures the images don't bleed out of the rounded corners
-              child: AspectRatio(
-                aspectRatio: 16 / 9, // Forces the container to be a landscape rectangle perfectly wrapping the image
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // Base Normal Image
-                    _buildImage('assets/images/visage_normal.jpg'),
-                    
-                    // Droop Image fades over it
-                    Opacity(
-                      opacity: droopOpacity,
-                      child: _buildImage('assets/images/visage_droop.jpg'),
-                    ),
-                    
-                    // Warning icon
-                    if (droopOpacity > 0.8)
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                          ),
-                          child: const Icon(
-                            Icons.warning_rounded,
-                            color: AppColors.emergency,
-                            size: 28,
-                          ),
-                        ).animate().scale(curve: Curves.elasticOut),
-                      ),
-                  ],
-                ),
+            // The Custom Painter Canvas
+            SizedBox(
+              width: 160,
+              height: 160,
+              child: CustomPaint(
+                painter: _FacePainter(droopFactor: droopOpacity),
               ),
             ),
             
@@ -262,29 +198,95 @@ class _ImageCrossfadePlaceholderState extends State<_ImageCrossfadePlaceholder> 
       },
     );
   }
+}
 
-  Widget _buildImage(String path) {
-    return Image.asset(
-      path,
-      fit: BoxFit.cover, // Fills the 16:9 AspectRatio container completely edge-to-edge
-      errorBuilder: (context, error, stackTrace) {
-        // Fallback UI when images are missing
-        return Container(
-          color: Colors.grey[200],
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.image_not_supported, color: Colors.grey, size: 40),
-              const SizedBox(height: 8),
-              Text(
-                'Missing Image:\n$path',
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.black54, fontSize: 12),
-              ),
-            ],
-          ),
-        );
-      },
+class _FacePainter extends CustomPainter {
+  final double droopFactor; // 0.0 = normal, 1.0 = fully drooped
+
+  _FacePainter({required this.droopFactor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    // Head Background
+    final paintHead = Paint()
+      ..color = AppColors.background
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, radius, paintHead);
+
+    // Head Outline
+    final paintOutline = Paint()
+      ..color = AppColors.primary.withValues(alpha: 0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6;
+    canvas.drawCircle(center, radius, paintOutline);
+
+    // Eyes
+    final eyePaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5
+      ..strokeCap = StrokeCap.round;
+
+    final eyeY = center.dy - radius * 0.15;
+    final leftEyeX = center.dx - radius * 0.4;
+    final rightEyeX = center.dx + radius * 0.4;
+    final eyeWidth = radius * 0.3;
+
+    // Left eye (Always serene closed arc)
+    Path leftEyePath = Path();
+    leftEyePath.moveTo(leftEyeX - eyeWidth / 2, eyeY);
+    leftEyePath.quadraticBezierTo(leftEyeX, eyeY - 15, leftEyeX + eyeWidth / 2, eyeY);
+    canvas.drawPath(leftEyePath, eyePaint);
+
+    // Right eye (Droops and flattens out)
+    final rightEyeDroopY = eyeY + (20 * droopFactor);
+    Path rightEyePath = Path();
+    rightEyePath.moveTo(rightEyeX - eyeWidth / 2, eyeY);
+    rightEyePath.quadraticBezierTo(
+      rightEyeX, 
+      eyeY - 15 * (1 - droopFactor) + 5 * droopFactor, // Arc flattens and drops
+      rightEyeX + eyeWidth / 2, 
+      rightEyeDroopY
     );
+    canvas.drawPath(rightEyePath, eyePaint);
+
+    // Mouth
+    final mouthPaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round;
+
+    final mouthY = center.dy + radius * 0.3;
+    final mouthWidth = radius * 0.6;
+    final leftMouthX = center.dx - mouthWidth / 2;
+    final rightMouthX = center.dx + mouthWidth / 2;
+
+    Path mouthPath = Path();
+    mouthPath.moveTo(leftMouthX, mouthY - 10); // Left corner (stable)
+    
+    // Control point for the smile curve
+    final smileControlY = mouthY + 30;
+    
+    // As droopFactor increases, the right corner and the control point fall
+    final rightMouthDroopY = (mouthY - 10) + (50 * droopFactor);
+    final droopedControlY = smileControlY + (10 * droopFactor);
+
+    mouthPath.quadraticBezierTo(
+      center.dx, 
+      droopedControlY, 
+      rightMouthX, 
+      rightMouthDroopY
+    );
+    
+    canvas.drawPath(mouthPath, mouthPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _FacePainter oldDelegate) {
+    return oldDelegate.droopFactor != droopFactor;
   }
 }
