@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../app/theme/colors.dart';
 import '../../../core/models/stroke_center.dart';
@@ -220,15 +221,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
           ),
 
-          // Back Button
+          // Home Button
           Positioned(
             top: 50,
             left: 16,
             child: CircleAvatar(
               backgroundColor: Colors.white,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.home, color: Colors.black),
+                onPressed: () => context.go('/dashboard'),
               ),
             ),
           ),

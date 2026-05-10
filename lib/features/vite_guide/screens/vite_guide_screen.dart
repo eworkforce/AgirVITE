@@ -42,6 +42,10 @@ class _ViteGuideScreenState extends ConsumerState<ViteGuideScreen> with SingleTi
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.home, color: AppColors.primary),
+          onPressed: () => context.go('/dashboard'),
+        ),
         title: Row(
           children: [
             Image.asset(

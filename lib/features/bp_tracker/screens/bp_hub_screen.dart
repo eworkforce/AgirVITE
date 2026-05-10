@@ -14,6 +14,10 @@ class BPHubScreen extends StatelessWidget {
         title: const Text('Ma Tension'),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.home, color: AppColors.primary),
+          onPressed: () => context.go('/dashboard'),
+        ),
       ),
       body: SafeArea(
         child: Padding(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:go_router/go_router.dart';
 
 class StoriesFeedScreen extends StatefulWidget {
   const StoriesFeedScreen({super.key});
@@ -20,12 +21,27 @@ class _StoriesFeedScreenState extends State<StoriesFeedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: PageView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: videoUrls.length,
-        itemBuilder: (context, index) {
-          return StoryItem(url: videoUrls[index]);
-        },
+      body: Stack(
+        children: [
+          PageView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: videoUrls.length,
+            itemBuilder: (context, index) {
+              return StoryItem(url: videoUrls[index]);
+            },
+          ),
+          Positioned(
+            top: 50,
+            left: 16,
+            child: CircleAvatar(
+              backgroundColor: Colors.black54,
+              child: IconButton(
+                icon: const Icon(Icons.home, color: Colors.white),
+                onPressed: () => context.go('/dashboard'),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
