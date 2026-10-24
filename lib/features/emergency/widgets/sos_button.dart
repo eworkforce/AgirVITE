@@ -34,16 +34,21 @@ class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProvider
     setState(() => _isPressed = false);
     _controller.reset();
     
-    // Trigger Service
+    // 1. Get registered guardians
     final guardiansAsync = ref.read(guardiansListProvider);
     final numbers = guardiansAsync.valueOrNull?.map((g) => g.phoneNumber).toList() ?? [];
     
-    ref.read(emergencyServiceProvider).callSAMU();
+    // 2. Immediate native dialing to SAMU (185) - Never blocked
+    ref.read(emergencyServiceProvider).callSAMU().catchError((error) {
+      debugPrint('SAMU Dialing error: $error');
+    });
+
+    // 3. Alert guardians via WhatsApp (primary guardian first) with auto SMS fallback
     ref.read(emergencyServiceProvider).sendWhatsAppAlert(numbers);
     
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Appel d\'urgence déclenché !'),
+        content: Text('Appel SAMU 185 déclenché ! Alerte gardiens en cours...'),
         backgroundColor: AppColors.emergency,
         duration: Duration(seconds: 5),
       ),

@@ -14,7 +14,17 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Configuration
-APK_SOURCE="build/app/outputs/apk/debug/app-debug.apk"
+if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+    APK_SOURCE="build/app/outputs/flutter-apk/app-release.apk"
+elif [ -f "VITE-release.apk" ]; then
+    APK_SOURCE="VITE-release.apk"
+elif [ -f "build/app/outputs/flutter-apk/app-debug.apk" ]; then
+    APK_SOURCE="build/app/outputs/flutter-apk/app-debug.apk"
+elif [ -f "build/app/outputs/apk/debug/app-debug.apk" ]; then
+    APK_SOURCE="build/app/outputs/apk/debug/app-debug.apk"
+else
+    APK_SOURCE="build/app/outputs/flutter-apk/app-release.apk"
+fi
 APK_OUTPUT="VITE-App.apk"
 QR_OUTPUT="qr-code-download.png"
 

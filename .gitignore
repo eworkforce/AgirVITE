@@ -47,8 +47,15 @@ app.*.map.json
 # YoYo AI version control directory
 .yoyo/
 
-# APK Distribution
+# APK Distribution & Scratch Artifacts
 qr-code-download.png
-VITE-App.apk
-VITE-alpha.apk
+*.apk
 .specstory/
+build_video_scratch/
+assets/videos/Old1/
+assets/videos/Old2/
+preview_animations*.html
+ToReadyForReviewStage.md
+render_*.py
+run_sub_renders_*.sh
+test_card_fix.py

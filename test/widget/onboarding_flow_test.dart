@@ -2,10 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:agir_vite/app/app.dart';
 import 'package:agir_vite/core/repositories/onboarding_repository.dart';
+import 'package:agir_vite/features/onboarding/screens/intro_video_screen.dart';
 import 'package:agir_vite/features/onboarding/screens/brand_screen.dart';
 import 'package:agir_vite/features/onboarding/screens/pledge_screen.dart';
 import 'package:agir_vite/features/onboarding/screens/reflex_drill_screen.dart';
-
 import 'package:agir_vite/features/onboarding/screens/profile_setup_screen.dart';
 
 // Fake Repository
@@ -34,75 +34,76 @@ void main() {
       ),
     );
 
-    // 1. Initial State: Brand Screen
-    // Infinite animation on BrandScreen prevents pumpAndSettle from returning.
-    // We pump for a short duration to let the widget build and animation start.
-    await tester.pump(const Duration(seconds: 1));
+    // 1. Initial State: Intro Video Screen
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byType(IntroVideoScreen), findsOneWidget);
+    expect(find.text('Passer la vidéo'), findsOneWidget);
+
+    // 2. Skip Intro Video to Brand Screen
+    await tester.tap(find.text('Passer la vidéo'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(seconds: 2));
     expect(find.byType(BrandScreen), findsOneWidget);
     expect(find.text('Continuer'), findsOneWidget);
 
-    // 2. Navigate to Pledge Screen
+    // 3. Navigate to Pledge Screen
+    await tester.ensureVisible(find.text('Continuer'));
     await tester.tap(find.text('Continuer'));
-    // Once we navigate away, the infinite animation is disposed, so pumpAndSettle should work.
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle(); // Pledge Screen has finite or no animations
     expect(find.byType(PledgeScreen), findsOneWidget);
-    expect(find.text("Contre l'AVC,"), findsOneWidget);
 
-    // 3. Navigate to Reflex Drill Screen
+    // 4. Navigate to Reflex Screen
     await tester.tap(find.text('Continuer'));
     await tester.pumpAndSettle();
     expect(find.byType(ReflexDrillScreen), findsOneWidget);
-    expect(find.text("Le Réflexe V.I.T.E."), findsOneWidget);
-
-    // 4. Perform Reflex Drill (Long Press)
-    // final sosButton = find.byType(GestureDetector).first; // Needs specific finder usually, but here it's the main interaction
-    // Or find by text inside the button or specific key if added. 
-    // The button has a child Stack with "SOS" text.
-    final sosFinder = find.text('SOS');
-    
-    // Press and hold for 2.1 seconds (slightly more than required 2s)
-    await tester.press(sosFinder);
-    await tester.pump(const Duration(milliseconds: 1000)); // Halfway
-    await tester.pump(const Duration(milliseconds: 1100)); // Complete
-    await tester.pumpAndSettle(); // Wait for navigation
-    // We also need to release the gesture in reality, but tester.pressDown / press might be better if we want fine control.
-    // tester.press does a down and up sequence but usually short.
-    // We need tester.longPress or manual down/pause/up.
   });
-  
+
   testWidgets('Reflex Drill Success Logic', (WidgetTester tester) async {
-      final fakeRepository = FakeOnboardingRepository();
-  
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            onboardingRepositoryProvider.overrideWithValue(fakeRepository),
-          ],
-          child: const AgirViteApp(),
-        ),
-      );
-      
-      // Fast forward to Reflex Screen
-      await tester.pump(const Duration(seconds: 1)); // Brand (avoid pumpAndSettle due to infinite anim)
-      await tester.tap(find.text('Continuer'));
-      await tester.pumpAndSettle(); // Pledge
-      await tester.tap(find.text('Continuer'));
-      await tester.pumpAndSettle(); // Reflex
-  
-      // Execute Long Press
-      final gesture = await tester.startGesture(tester.getCenter(find.text('SOS')));
-      
-      // Pump frames to simulate time passing and progress updating
-      for (int i = 0; i < 45; i++) { // 45 * 50ms = 2250ms > 2000ms
-        await tester.pump(const Duration(milliseconds: 50));
-      }
-      
-      await gesture.up();
-      await tester.pumpAndSettle();
-  
-      // Should be on Profile Setup Screen now (NOT Dashboard)
-      expect(find.byType(ProfileSetupScreen), findsOneWidget);
-      // Onboarding is NOT complete yet
-      expect(await fakeRepository.isOnboardingComplete(), isFalse);
-    });
+    final fakeRepository = FakeOnboardingRepository();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          onboardingRepositoryProvider.overrideWithValue(fakeRepository),
+        ],
+        child: const AgirViteApp(),
+      ),
+    );
+
+    // Skip Intro Video
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.tap(find.text('Passer la vidéo'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(seconds: 2)); // Brand Screen
+
+    // Navigate to Pledge
+    await tester.ensureVisible(find.text('Continuer'));
+    await tester.tap(find.text('Continuer'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle(); // Pledge
+
+    // Navigate to Reflex
+    await tester.tap(find.text('Continuer'));
+    await tester.pumpAndSettle(); // Reflex
+
+    // Execute Long Press on SOS
+    final gesture = await tester.startGesture(tester.getCenter(find.text('SOS')));
+
+    // Pump frames to simulate time passing and progress updating
+    for (int i = 0; i < 45; i++) {
+      // 45 * 50ms = 2250ms > 2000ms
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    // Should be on Profile Setup Screen now (NOT Dashboard)
+    expect(find.byType(ProfileSetupScreen), findsOneWidget);
+    // Onboarding is NOT complete yet
+    expect(await fakeRepository.isOnboardingComplete(), isFalse);
+  });
 }

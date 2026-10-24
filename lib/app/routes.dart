@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/dashboard/screens/dashboard_screen.dart';
+import '../features/onboarding/screens/intro_video_screen.dart';
 import '../features/onboarding/screens/brand_screen.dart';
 import '../features/onboarding/screens/pledge_screen.dart';
 import '../features/onboarding/screens/reflex_drill_screen.dart';
@@ -20,7 +21,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final onboardingState = ref.watch(onboardingControllerProvider);
   
   return GoRouter(
-    initialLocation: '/onboarding/brand',
+    initialLocation: '/onboarding/intro-video',
     redirect: (context, state) {
       // While loading onboarding status, we don't redirect yet
       if (onboardingState.isLoading) return null;
@@ -28,29 +29,22 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isComplete = onboardingState.valueOrNull ?? false;
       final isGoingToOnboarding = state.matchedLocation.startsWith('/onboarding');
       
-      // LOGIC CHANGE:
+      // LOGIC:
       // Even if onboarding is complete (isComplete == true), we do NOT force redirect to dashboard.
-      // We ALWAYS allow the user to see the initial screen ('/onboarding/brand') if that's where they are starting.
-      // The "Brand Screen" is effectively the Splash/Welcome screen.
-      
+      // We allow the user to see the intro video / welcome screen if that's where they are starting.
       // Only redirect IF we are trying to access a protected route (like /dashboard) 
       // AND we haven't finished onboarding.
       if (!isComplete && !isGoingToOnboarding) {
-        return '/onboarding/brand';
+        return '/onboarding/intro-video';
       }
-
-      // If we are fully onboarded, we generally want to let the user stay on the landing page
-      // until they explicitly tap "Continuer". 
-      // However, if the App reloads, GoRouter might try to restore the last route.
-      // 
-      // If the requirement is "Always start at Brand Screen", we should simply REMOVE the 
-      // redirect that pushes them to dashboard.
-
-      // REMOVED: The block that auto-redirects to dashboard if isComplete is true.
       
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/onboarding/intro-video',
+        builder: (context, state) => const IntroVideoScreen(),
+      ),
       GoRoute(
         path: '/onboarding/brand',
         builder: (context, state) => const BrandScreen(),

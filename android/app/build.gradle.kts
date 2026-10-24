@@ -40,6 +40,10 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    androidResources {
+        noCompress += listOf("mp4", "m4v")
+    }
 }
 
 flutter {
