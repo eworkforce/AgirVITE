@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:video_player/video_player.dart';
 import 'package:agir_vite/app/widgets/main_shell.dart';
 import 'package:agir_vite/features/onboarding/screens/brand_screen.dart';
+import 'package:agir_vite/features/shared/widgets/vite_video_theater_modal.dart';
 import 'package:agir_vite/features/vite_guide/screens/en_urgence_screen.dart';
 
 void main() {
@@ -97,5 +99,56 @@ void main() {
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(milliseconds: 100));
+  });
+
+  testWidgets('ViteVideoTheaterModal renders clean icon-only fullscreen without overflow and closes on tap', (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(const Size(320, 568));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final controller = VideoPlayerController.asset('assets/videos/master_visage_v.mp4');
+    addTearDown(() => controller.dispose());
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (_) => ViteVideoTheaterModal(
+                        controller: controller,
+                        caption: 'Affaissement du visage',
+                        isMuted: false,
+                        onToggleMute: () {},
+                      ),
+                    );
+                  },
+                  child: const Text('Open Theater'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open Theater'));
+    await tester.pumpAndSettle();
+
+    // Verify no text labels or SOS clutter are shown
+    expect(find.text('Vue Cinéma'), findsNothing);
+    expect(find.text('SOS'), findsNothing);
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+    expect(find.byKey(const Key('theater_close_button')), findsOneWidget);
+    expect(find.byKey(const Key('theater_collapse_button')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.byKey(const Key('theater_close_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ViteVideoTheaterModal), findsNothing);
   });
 }

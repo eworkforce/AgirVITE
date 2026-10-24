@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import '../../../app/theme/colors.dart';
 import '../../../core/utils/video_asset_helper.dart';
+import 'vite_video_theater_modal.dart';
 
 class ViteVideoPlayer extends StatefulWidget {
   final String assetPath;
@@ -53,7 +54,9 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
   void _videoListener() {
     if (!mounted) return;
     if (_controller != null && _controller!.value.hasError) {
-      debugPrint('Video player runtime error for ${widget.assetPath}: ${_controller!.value.errorDescription}');
+      debugPrint(
+        'Video player runtime error for ${widget.assetPath}: ${_controller!.value.errorDescription}',
+      );
       setState(() {
         _hasError = true;
         _isInitialized = false;
@@ -120,6 +123,44 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
     });
   }
 
+  Future<void> _openLargeView() async {
+    final controller = _controller;
+    if (controller == null || !_isInitialized) return;
+
+    await showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Fermer la vue agrandie',
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 240),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return ViteVideoTheaterModal(
+          controller: controller,
+          caption: widget.caption,
+          isMuted: _isMuted,
+          onToggleMute: _toggleMute,
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        );
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.94, end: 1.0).animate(curved),
+            child: child,
+          ),
+        );
+      },
+    );
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   void dispose() {
     _controller?.removeListener(_videoListener);
@@ -166,7 +207,11 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline, color: AppColors.emergency, size: 36),
+                      const Icon(
+                        Icons.error_outline,
+                        color: AppColors.emergency,
+                        size: 36,
+                      ),
                       const SizedBox(height: 8),
                       const Text(
                         'Impossible de charger la vidéo',
@@ -176,8 +221,15 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
                       const SizedBox(height: 12),
                       TextButton.icon(
                         onPressed: _initializePlayer,
-                        icon: const Icon(Icons.refresh, color: AppColors.secondary, size: 18),
-                        label: const Text('Réessayer', style: TextStyle(color: AppColors.secondary)),
+                        icon: const Icon(
+                          Icons.refresh,
+                          color: AppColors.secondary,
+                          size: 18,
+                        ),
+                        label: const Text(
+                          'Réessayer',
+                          style: TextStyle(color: AppColors.secondary),
+                        ),
                       ),
                     ],
                   ),
@@ -195,7 +247,6 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
 
             // Controls overlay when initialized
             if (_isInitialized && _controller != null) ...[
-              // Play/pause pulse button when paused
               if (!_controller!.value.isPlaying)
                 GestureDetector(
                   onTap: _togglePlayPause,
@@ -206,11 +257,15 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
                       color: Colors.black.withValues(alpha: 0.6),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 40),
+                    child: const Icon(
+                      Icons.play_arrow_rounded,
+                      color: Colors.white,
+                      size: 40,
+                    ),
                   ),
                 ),
 
-              // Bottom control bar & caption
+              // Bottom control bar: Play/Pause, Caption, Mute, and Large View ("Agrandir")
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -222,23 +277,28 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withValues(alpha: 0.75),
+                        Colors.black.withValues(alpha: 0.78),
                       ],
                     ),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   child: Row(
                     children: [
-                      // Mini Play/Pause button
                       IconButton(
                         icon: Icon(
-                          _controller!.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                          _controller!.value.isPlaying
+                              ? Icons.pause
+                              : Icons.play_arrow,
                           color: Colors.white,
                           size: 20,
                         ),
                         onPressed: _togglePlayPause,
-                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                        constraints: const BoxConstraints(
+                          minWidth: 38,
+                          minHeight: 38,
+                        ),
                         padding: EdgeInsets.zero,
+                        tooltip: _controller!.value.isPlaying ? 'Pause' : 'Lecture',
                       ),
                       if (widget.caption != null) ...[
                         const SizedBox(width: 4),
@@ -256,7 +316,6 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
                         ),
                       ] else
                         const Spacer(),
-                      // Mute toggle
                       IconButton(
                         icon: Icon(
                           _isMuted ? Icons.volume_off : Icons.volume_up,
@@ -264,8 +323,28 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
                           size: 20,
                         ),
                         onPressed: _toggleMute,
-                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                        constraints: const BoxConstraints(
+                          minWidth: 38,
+                          minHeight: 38,
+                        ),
                         padding: EdgeInsets.zero,
+                        tooltip: _isMuted ? 'Activer le son' : 'Couper le son',
+                      ),
+                      const SizedBox(width: 2),
+                      IconButton(
+                        key: const Key('vite_video_expand_button'),
+                        icon: const Icon(
+                          Icons.open_in_full_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        onPressed: _openLargeView,
+                        constraints: const BoxConstraints(
+                          minWidth: 38,
+                          minHeight: 38,
+                        ),
+                        padding: EdgeInsets.zero,
+                        tooltip: 'Agrandir la vidéo',
                       ),
                     ],
                   ),

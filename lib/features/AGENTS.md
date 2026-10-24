@@ -16,7 +16,7 @@ Owns all feature-first presentation code, screen flows, widget hierarchies, visu
 - `lib/features/stories/`: Educational video/story feed.
 - `lib/features/guardians/`: Guardian model, repository, and list providers.
 - `lib/features/profile/`: User profile and guardian management dialogs.
-- `lib/features/shared/`: Shared UI components (`CalmButton`, `ViteVideoPlayer`).
+- `lib/features/shared/`: Shared UI components (`CalmButton`, `ViteVideoPlayer`, `ViteVideoTheaterModal`).
 
 ## Local Contracts
 
