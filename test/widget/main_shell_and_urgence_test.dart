@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:agir_vite/app/widgets/main_shell.dart';
+import 'package:agir_vite/features/onboarding/screens/brand_screen.dart';
 import 'package:agir_vite/features/vite_guide/screens/en_urgence_screen.dart';
 
 void main() {
@@ -70,5 +71,31 @@ void main() {
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
+  });
+
+  testWidgets('BrandScreen fits entirely in 360x640 viewport without scrolling and shows Continuer CTA', (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(const Size(360, 640));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: BrandScreen(),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(seconds: 2));
+
+    expect(find.text('V.I.T.E'), findsOneWidget);
+    expect(find.text('Continuer'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_forward_rounded), findsOneWidget);
+
+    // Ensure the 'Continuer' button is fully inside the 640px vertical viewport
+    final buttonRect = tester.getRect(find.widgetWithText(ElevatedButton, 'Continuer'));
+    expect(buttonRect.bottom, lessThanOrEqualTo(640.0));
+    expect(tester.takeException(), isNull);
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(milliseconds: 100));
   });
 }
