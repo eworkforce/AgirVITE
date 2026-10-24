@@ -16,22 +16,22 @@ Defines and maintains the authoritative product requirements, system architectur
 
 ## Local Contracts
 
-1. **Local-First Mandate:** All user health data and guardian configs persist exclusively in Hive local storage. No remote sync or cloud data collection is required.
-2. **"Serene Wave" Visual Language:**
+1. **Local-First Mandate:** All user profile and guardian configs persist exclusively in Hive local storage. No Firebase, remote sync, or cloud data collection is used.
+2. **Scope Removal (BP Tracker):** Blood Pressure (`Tension`) tracking and OCR have been completely removed from the app and navigation shell (`[Accueil, Centres] — (SOS) — [Guide, Conseils]`).
+3. **"Serene Wave" Visual Language (100% Offline):**
    - Deep Teal (`#006D77`), Soft Sage (`#83C5BE`), Warm Sand (`#EDF6F9`), Terracotta (`#E29578`), Deep Terracotta (`#BC4749`).
-   - Font Pairings: `Outfit` (Headings) and `Inter` (Body).
+   - Font Pairings: Bundled `Outfit` (Headings) and `Inter` (Body) in `assets/fonts/` with runtime fetching disabled.
    - High-contrast sunlight readability and minimum 60x60dp touch targets for accessibility.
-3. **Emergency Priority:**
+4. **Emergency Priority:**
    - Primary: Immediate native dialing to SAMU (`185`).
    - Secondary: Direct WhatsApp 1-to-1 dispatch to primary guardian + native multi-recipient SMS broadcast fallback with GPS coordinates.
-4. **V.I.T.E. Education:**
-   - Real-time 60fps canvas/vector animations for V, I, T, and animated urgent countdown for E (4.5h window).
-   - Optional local video modal demonstration for clinical symptom drill.
+5. **V.I.T.E. Education:**
+   - Bundled local videos (`master_visage_v.mp4`, `master_incapacite_i.mp4`, `master_trouble_t.mp4`, `master_urgence_e.mp4`) and `intro_vite_9x16.mp4` for V.I.T.E. symptom recognition and the 4h30 emergency window.
 
 ## Work Guidance
 
 - When code and design documents diverge, treat the `DESIGN/` folder as the structural source of truth.
-- Update `ARCHI.md` and `PRD.md` whenever core technical decisions (such as the 100% local persistence rule) are formalized.
+- Update `ARCHI.md` and `PRD.md` whenever core technical decisions are formalized.
 
 ## Verification
 

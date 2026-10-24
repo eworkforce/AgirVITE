@@ -9,18 +9,19 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine the current index based on the route
     final String location = GoRouterState.of(context).uri.path;
-    int currentIndex = 0; // Default to Dashboard
-    
-    if (location.startsWith('/bp-tracker')) {
-      currentIndex = 1;
+    int currentIndex = 0;
+
+    if (location.startsWith('/dashboard')) {
+      currentIndex = 0;
     } else if (location.startsWith('/map')) {
-      currentIndex = 2;
+      currentIndex = 1;
     } else if (location.startsWith('/vite-guide')) {
-      currentIndex = 3;
+      currentIndex = 2;
     } else if (location.startsWith('/stories')) {
-      currentIndex = 4;
+      currentIndex = 3;
+    } else {
+      currentIndex = -1;
     }
 
     return Scaffold(
@@ -39,37 +40,37 @@ class MainShell extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              // Left side
+              // Left side: Accueil & Centres
               _buildNavItem(
                 context,
-                icon: Icons.favorite_border,
-                label: 'Tension',
-                isSelected: currentIndex == 1,
-                onTap: () => context.go('/bp-tracker'),
+                icon: currentIndex == 0 ? Icons.home : Icons.home_outlined,
+                label: 'Accueil',
+                isSelected: currentIndex == 0,
+                onTap: () => context.go('/dashboard'),
               ),
               _buildNavItem(
                 context,
                 icon: Icons.local_hospital_outlined,
                 label: 'Centres',
-                isSelected: currentIndex == 2,
+                isSelected: currentIndex == 1,
                 onTap: () => context.go('/map'),
               ),
-              
+
               const SizedBox(width: 48.0), // Space for the docked FAB
-              
-              // Right side
+
+              // Right side: Guide & Conseils
               _buildNavItem(
                 context,
                 icon: Icons.menu_book_outlined,
                 label: 'Guide',
-                isSelected: currentIndex == 3,
+                isSelected: currentIndex == 2,
                 onTap: () => context.go('/vite-guide'),
               ),
               _buildNavItem(
                 context,
                 icon: Icons.article_outlined,
                 label: 'Conseils',
-                isSelected: currentIndex == 4,
+                isSelected: currentIndex == 3,
                 onTap: () => context.go('/stories'),
               ),
             ],
@@ -87,27 +88,30 @@ class MainShell extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    final color = isSelected 
-        ? theme.colorScheme.primary 
+    final color = isSelected
+        ? theme.colorScheme.primary
         : theme.colorScheme.onSurface.withValues(alpha: 0.6);
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: color,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: color,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

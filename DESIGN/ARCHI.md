@@ -1,15 +1,15 @@
 ---
 title: Technical Architecture Document
-version: 2.0.0
-status: Draft
-date: December 2025
-related_prd: docs/PRD.md
-global_rules: docs/Global_Rules.md
+version: 2.1.0
+status: Active (100% Local-First)
+date: October 2026
+related_prd: DESIGN/PRD.md
+global_rules: DESIGN/Global_Rules.md
 ---
 
 # **1. Architecture Overview (The Map)**
 
-*High-level system design identifying boundaries and external systems for Agir V.I.T.E. 2.0 — a stroke prevention mobile application.*
+*High-level system design identifying boundaries and external systems for Agir V.I.T.E. 2.0 — a 100% local-first stroke education and emergency response mobile application.*
 
 ## **1.1 C4 Context Diagram**
 
@@ -17,27 +17,21 @@ global_rules: docs/Global_Rules.md
 C4Context
     title System Context Diagram for Agir V.I.T.E. 2.0
     
-    Person(patient, "Patient/User", "Hypertensive adult tracking health and responding to emergencies")
+    Person(patient, "Patient/User", "Adult learning V.I.T.E. signs and responding to stroke emergencies")
     Person(guardian, "Guardian", "Family member receiving emergency alerts")
-    Person(admin, "ONG Admin", "Content manager for stories and centers")
     
-    System(app, "Agir V.I.T.E. App", "Flutter mobile application with offline-first architecture")
+    System(app, "Agir V.I.T.E. App", "Flutter mobile application with 100% local-first architecture")
     
-    System_Ext(firebase, "Firebase Platform", "Authentication, Firestore, Cloud Functions, Storage")
-    System_Ext(gemini, "Google Gemini API", "AI-powered OCR for BP monitor reading")
-    System_Ext(whatsapp, "WhatsApp", "Guardian notification channel")
+    System_Ext(whatsapp, "WhatsApp / Native SMS", "Guardian notification channels with GPS coordinates")
     System_Ext(samu, "SAMU (185)", "Emergency medical services via native dialer")
-    System_Ext(maps, "OpenStreetMap", "Vector tiles for offline mapping")
+    System_Ext(maps, "OpenStreetMap", "Map tiles for Stroke Center localization")
     
-    Rel(patient, app, "Uses", "Touch/Voice")
-    Rel(guardian, whatsapp, "Receives alerts", "WhatsApp Message")
-    Rel(admin, firebase, "Manages content", "Console/API")
+    Rel(patient, app, "Uses", "Touch/Video")
+    Rel(guardian, whatsapp, "Receives alerts", "WhatsApp / SMS")
     
-    Rel(app, firebase, "Auth, Data Sync, Storage", "HTTPS")
-    Rel(app, gemini, "Image → BP values", "HTTPS/REST")
-    Rel(app, whatsapp, "Sends alerts", "Deep Link")
+    Rel(app, whatsapp, "Sends alerts", "Deep Link / SMS URI")
     Rel(app, samu, "Emergency call", "Native Dialer")
-    Rel(app, maps, "Downloads tiles", "HTTPS")
+    Rel(app, maps, "Displays stroke centers", "HTTPS / Bundled JSON")
 ```
 
 ## **1.2 C4 Container Diagram**
@@ -46,46 +40,28 @@ C4Context
 C4Container
     title Container Diagram for Agir V.I.T.E. 2.0
     
-    Person(user, "User", "Patient or Guardian")
+    Person(user, "User", "Patient or Witness")
     
     Container_Boundary(mobile, "Mobile Application") {
         Container(flutter_app, "Flutter App", "Dart/Flutter", "Cross-platform mobile application with Impeller rendering")
-        ContainerDb(local_db, "Local Database", "Hive/Isar", "Offline data persistence, caching")
-        Container(rive_runtime, "Rive Runtime", "Rive", "Interactive animations with State Machines")
-    }
-    
-    Container_Boundary(firebase_platform, "Firebase Platform") {
-        Container(auth, "Firebase Auth", "Firebase", "Phone + Anonymous authentication")
-        ContainerDb(firestore, "Cloud Firestore", "Firebase", "User data, BP readings, guardians")
-        Container(functions, "Cloud Functions", "Node.js", "Backend logic, notifications")
-        ContainerDb(storage, "Cloud Storage", "Firebase", "Video stories, assets")
-    }
-    
-    Container_Boundary(external_ai, "AI Services") {
-        Container(gemini_api, "Gemini 1.5 Flash", "Google AI", "Multimodal OCR for BP extraction")
-        Container(ml_kit, "ML Kit", "On-device", "Offline OCR fallback")
+        ContainerDb(local_db, "Local Database", "Hive", "100% offline data persistence (UserProfile, Guardians, Settings)")
+        Container(video_runtime, "Video Engine", "video_player", "Bundled MP4 symptom and intro videos with file-cache fallback")
     }
     
     Rel(user, flutter_app, "Interacts with", "Touch")
     Rel(flutter_app, local_db, "Reads/Writes", "Hive API")
-    Rel(flutter_app, rive_runtime, "Triggers animations", "State Machine Inputs")
-    Rel(flutter_app, auth, "Authenticates", "Firebase SDK")
-    Rel(flutter_app, firestore, "Syncs data", "Firebase SDK")
-    Rel(flutter_app, functions, "Triggers", "HTTPS")
-    Rel(flutter_app, storage, "Downloads media", "Firebase SDK")
-    Rel(flutter_app, gemini_api, "Sends images", "REST API")
-    Rel(flutter_app, ml_kit, "Processes locally", "ML Kit SDK")
+    Rel(flutter_app, video_runtime, "Plays bundled videos", "Asset / Temp File")
 ```
 
 ## **1.3 Offline-First Architecture Principles**
 
-| Principle                    | Implementation                                                            |
-| :--------------------------- | :------------------------------------------------------------------------ |
-| **Local-First Data**         | All user data written to Hive/Isar first, synced to Firestore when online |
-| **Pessimistic Connectivity** | Assume offline; treat online as enhancement                               |
-| **Graceful Degradation**     | AI-OCR falls back to ML Kit; WhatsApp falls back to native SMS (Phase 3)  |
-| **Content Pre-bundling**     | V.I.T.E. animations, audio, and map tiles bundled with APK                |
-| **Queue-Based Sync**         | Offline writes queued and flushed on connectivity restoration             |
+| Principle                    | Implementation                                                                    |
+| :--------------------------- | :-------------------------------------------------------------------------------- |
+| **100% Local-First Data**    | All user profile and guardian data persisted exclusively in Hive; no cloud sync   |
+| **Zero Runtime Font Fetch**  | `Outfit` and `Inter` `.ttf` fonts bundled in `assets/fonts/` (`allowRuntimeFetching = false`) |
+| **Graceful Degradation**     | WhatsApp alert automatically falls back to native multi-recipient SMS broadcast   |
+| **Content Pre-bundling**     | V.I.T.E. master videos, intro video, stroke centers JSON, and fonts bundled in APK |
+| **Scope Simplification**     | Blood pressure (`Tension`) and cloud OCR removed to focus on V.I.T.E. & Emergency |
 
 ---
 
@@ -97,20 +73,16 @@ C4Container
 
 | Category              | Technology                | Version             | Constraints/Notes                     |
 | :-------------------- | :------------------------ | :------------------ | :------------------------------------ |
-| **Language**          | Dart                      | 3.x                 | Null safety required                  |
+| **Language**          | Dart                      | ^3.10.3             | Null safety required                  |
 | **Framework**         | Flutter                   | 3.24+               | Impeller engine mandatory for Android |
-| **Rendering**         | Impeller                  | Default             | Required for 60fps Rive animations    |
-| **Backend**           | Firebase                  | Latest              | Firestore, Auth, Functions, Storage   |
-| **Local Database**    | Hive or Isar              | Hive 2.x / Isar 3.x | NoSQL, fast, offline-optimized        |
+| **Local Database**    | Hive / Hive Flutter       | 2.2.3 / 1.1.0       | 100% local persistence, no cloud      |
 | **State Management**  | Riverpod                  | 2.x                 | Compile-time safe, testable           |
-| **Animations**        | Rive                      | 0.13+               | State Machine-driven animations       |
-| **Charts**            | fl_chart                  | 0.68+               | Animated health data visualization    |
-| **Mapping**           | flutter_map               | 6.x                 | With vector_map_tiles for offline     |
-| **AI-OCR (Primary)**  | Gemini 1.5 Flash          | 1.5                 | Multimodal, JSON output               |
-| **AI-OCR (Fallback)** | ML Kit (Text Recognition) | Latest              | On-device offline OCR                 |
-| **Location**          | geolocator                | 12.x                | GPS with Plus Code conversion         |
-| **Launcher**          | url_launcher              | 6.x                 | Native dialer, WhatsApp deep links    |
-| **HTTP Client**       | dio                       | 5.x                 | For Gemini API calls                  |
+| **Navigation**        | GoRouter                  | 13.x                | ShellRoute with `[Accueil, Centres, SOS, Guide, Conseils]` |
+| **Video Playback**    | video_player              | 2.9+                | Bundled MP4s via `VideoAssetHelper`   |
+| **Typography**        | google_fonts (offline)    | 6.x                 | Bundled `Outfit` & `Inter` in `assets/fonts/` |
+| **Mapping**           | flutter_map               | 7.x                 | Stroke centers from `stroke_centers.json` |
+| **Location**          | geolocator                | 12.x                | GPS coordinates for emergency alerts  |
+| **Launcher**          | url_launcher              | 6.x                 | Native dialer (`185`), WhatsApp, SMS  |
 
 ## **2.2 Development Prerequisites**
 

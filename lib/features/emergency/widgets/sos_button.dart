@@ -41,6 +41,7 @@ class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProvider
     // 2. Immediate native dialing to SAMU (185) - Never blocked
     ref.read(emergencyServiceProvider).callSAMU().catchError((error) {
       debugPrint('SAMU Dialing error: $error');
+      return false;
     });
 
     // 3. Alert guardians via WhatsApp (primary guardian first) with auto SMS fallback

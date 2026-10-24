@@ -81,12 +81,15 @@ class EnUrgenceScreen extends StatelessWidget {
                 children: [
                   const Icon(Icons.phone_in_talk, color: AppColors.emergency, size: 20),
                   const SizedBox(width: 8),
-                  Text(
-                    'Appelez immédiatement le SAMU (185)',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.emergency,
-                        ),
+                  Flexible(
+                    child: Text(
+                      'Appelez immédiatement le SAMU (185)',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.emergency,
+                          ),
+                    ),
                   ),
                 ],
               ),

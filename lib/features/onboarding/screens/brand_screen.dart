@@ -91,19 +91,21 @@ class BrandScreen extends ConsumerWidget {
                         const SizedBox(height: 20),
 
                         // Capsule 1 Intro Video (replaces central text "agir..")
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 440),
-                          child: const ViteVideoPlayer(
-                            assetPath: 'assets/videos/master_avc_espoir_vite.mp4',
-                            autoPlay: false,
-                            looping: false,
-                            aspectRatio: 16 / 9,
-                            borderRadius: 16,
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 440),
+                            child: const ViteVideoPlayer(
+                              assetPath: 'assets/videos/master_avc_espoir_vite.mp4',
+                              autoPlay: false,
+                              looping: false,
+                              aspectRatio: 16 / 9,
+                              borderRadius: 16,
+                            ),
+                          ).animate().fadeIn(delay: 300.ms).scale(
+                            begin: const Offset(0.96, 0.96),
+                            end: const Offset(1.0, 1.0),
+                            duration: 400.ms,
                           ),
-                        ).animate().fadeIn(delay: 300.ms).scale(
-                          begin: const Offset(0.96, 0.96),
-                          end: const Offset(1.0, 1.0),
-                          duration: 400.ms,
                         ),
 
                         const SizedBox(height: 20),

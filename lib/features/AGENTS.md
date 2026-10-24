@@ -8,32 +8,31 @@ Owns all feature-first presentation code, screen flows, widget hierarchies, visu
 
 ## Ownership
 
-- `lib/features/onboarding/`: Onboarding flow (`BrandScreen`, `PledgeScreen`, `ReflexDrillScreen`, `ProfileSetupScreen`).
-- `lib/features/dashboard/`: Main dashboard, welcome banner, quick action cards, BP status summary.
+- `lib/features/onboarding/`: Onboarding flow (`IntroVideoScreen`, `BrandScreen`, `PledgeScreen`, `ReflexDrillScreen`, `ProfileSetupScreen`).
+- `lib/features/dashboard/`: Main dashboard with personalized greeting and 2x2 V.I.T.E. emergency signs grid.
 - `lib/features/emergency/`: Persistent SOS button with 2-second long-press tactile gesture.
-- `lib/features/bp_tracker/`: Camera capture, manual entry, OCR review, BP history hub.
-- `lib/features/vite_guide/`: Tabbed educational module (Visage, Incapacité, Trouble, En Urgence).
-- `lib/features/map/`: Stroke center map, center details sheet, route indicators, location markers.
-- `lib/features/stories/`: Educational video feed with offline playback support.
-- `lib/features/guardians/`: Guardian management UI, list providers, add/delete dialogs.
-- `lib/features/profile/`: User settings, terms, emergency info.
-- `lib/features/shared/`: Shared UI components (`CalmButton`).
+- `lib/features/vite_guide/`: Tabbed educational module (`VisageScreen`, `IncapaciteScreen`, `TroubleScreen`, `EnUrgenceScreen`) with local `master_*.mp4` videos.
+- `lib/features/map/`: Stroke center map (`MapScreen`), slide-out menu (`MapSideMenu`), location marker (`UserLocationMarker`), and `CenterDetailsSheet`.
+- `lib/features/stories/`: Educational video/story feed.
+- `lib/features/guardians/`: Guardian model, repository, and list providers.
+- `lib/features/profile/`: User profile and guardian management dialogs.
+- `lib/features/shared/`: Shared UI components (`CalmButton`, `ViteVideoPlayer`).
 
 ## Local Contracts
 
 1. **State Management:**
    - Use `flutter_riverpod` exclusively (`ConsumerWidget`, `ConsumerStatefulWidget`, `AsyncNotifierProvider`).
-   - Do not use `get_it` or secondary service locators in presentation layers.
+   - Do not use secondary service locators in presentation layers.
 2. **File & Component Size:**
-   - Component and screen files should not exceed **300 lines**.
-   - Modularize large screens (e.g. `MapScreen`) into dedicated sub-widgets (side menu, markers, sheet).
+   - Component and screen files must not exceed **300 lines**.
+   - Modularize screens into dedicated sub-widgets (e.g., `lib/features/map/widgets/map_side_menu.dart`).
 3. **Design System & UX Rules:**
-   - Adhere strictly to "Serene Wave" tokens from `lib/app/theme/`.
+   - Adhere strictly to "Serene Wave" tokens from `lib/app/theme/` with bundled offline `Outfit` and `Inter` fonts (`GoogleFonts.config.allowRuntimeFetching = false`).
    - Ensure touch targets are at least **60x60dp** for core interactive elements.
-   - Docked SOS button in `MainShell` must remain reachable and never obscured by scrollable content.
-4. **V.I.T.E. Visual & Video Standards:**
-   - Maintain 60fps custom canvas animations for V, I, T, and an animated urgent countdown for E.
-   - For video demonstrations (e.g., `incapacite.mp4`), ensure controllers are initialized asynchronously and properly disposed on screen unmount.
+   - Docked SOS button in `MainShell` (`[Accueil, Centres] — (SOS) — [Guide, Conseils]`) must remain reachable and never obscured by scrollable content.
+4. **V.I.T.E. Video Standards:**
+   - Use `ViteVideoPlayer` and `VideoAssetHelper` for bundled `assets/videos/master_*.mp4` assets.
+   - Ensure video controllers are initialized asynchronously and properly disposed on screen unmount.
 5. **Lifecycle & Memory Management:**
    - Always cancel stream subscriptions (`StreamSubscription`), timers, and dispose `AnimationController` / `VideoPlayerController` in `dispose()`.
 

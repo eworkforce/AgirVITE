@@ -9,9 +9,6 @@ import '../features/onboarding/screens/reflex_drill_screen.dart';
 import '../features/onboarding/screens/profile_setup_screen.dart';
 import '../features/onboarding/providers/onboarding_provider.dart';
 import '../features/vite_guide/screens/vite_guide_screen.dart';
-import '../features/bp_tracker/screens/capture_screen.dart';
-import '../features/bp_tracker/screens/review_screen.dart';
-import '../features/bp_tracker/screens/bp_hub_screen.dart';
 import '../features/stories/screens/stories_feed_screen.dart';
 import '../features/map/screens/map_screen.dart';
 import '../features/profile/screens/profile_screen.dart';
@@ -19,25 +16,19 @@ import 'widgets/main_shell.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final onboardingState = ref.watch(onboardingControllerProvider);
-  
+
   return GoRouter(
     initialLocation: '/onboarding/intro-video',
     redirect: (context, state) {
-      // While loading onboarding status, we don't redirect yet
       if (onboardingState.isLoading) return null;
 
       final isComplete = onboardingState.valueOrNull ?? false;
       final isGoingToOnboarding = state.matchedLocation.startsWith('/onboarding');
-      
-      // LOGIC:
-      // Even if onboarding is complete (isComplete == true), we do NOT force redirect to dashboard.
-      // We allow the user to see the intro video / welcome screen if that's where they are starting.
-      // Only redirect IF we are trying to access a protected route (like /dashboard) 
-      // AND we haven't finished onboarding.
+
       if (!isComplete && !isGoingToOnboarding) {
         return '/onboarding/intro-video';
       }
-      
+
       return null;
     },
     routes: [
@@ -74,23 +65,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/vite-guide',
             builder: (context, state) {
-              final initialIndex = state.extra as int? ?? 0;
+              final initialIndex = state.extra is int ? state.extra as int : 0;
               return ViteGuideScreen(initialIndex: initialIndex);
-            },
-          ),
-          GoRoute(
-            path: '/bp-tracker',
-            builder: (context, state) => const BPHubScreen(),
-          ),
-          GoRoute(
-            path: '/bp-tracker/capture',
-            builder: (context, state) => const CaptureScreen(),
-          ),
-          GoRoute(
-            path: '/bp-tracker/review',
-            builder: (context, state) {
-              final extra = state.extra as Map<String, int>;
-              return ReviewScreen(extractedData: extra);
             },
           ),
           GoRoute(

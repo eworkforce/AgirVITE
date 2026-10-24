@@ -18,16 +18,22 @@ class EmergencyService {
   /// Triggers a direct native dialer call to SAMU (185).
   ///
   /// This must remain completely decoupled from network or location availability.
-  Future<void> callSAMU() async {
+  /// Returns `true` if the dialer was launched, or `false` if unavailable (e.g., tablet/emulator).
+  Future<bool> callSAMU() async {
     final Uri launchUri = Uri(
       scheme: 'tel',
       path: samuNumber,
     );
-    if (await canLaunchUrl(launchUri)) {
-      await launchUrl(launchUri);
-    } else {
-      debugPrint('Could not launch SAMU phone call: $launchUri');
-      throw 'Could not launch $launchUri';
+    try {
+      if (await canLaunchUrl(launchUri)) {
+        return await launchUrl(launchUri);
+      } else {
+        debugPrint('Could not launch SAMU phone call: $launchUri');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Error launching SAMU phone call: $e');
+      return false;
     }
   }
 

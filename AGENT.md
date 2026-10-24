@@ -21,13 +21,12 @@ The current implementation is a working Flutter prototype that partially impleme
 - Dart SDK constraint: `^3.10.3`
 - State management: `flutter_riverpod` with manual providers and `AsyncNotifierProvider`
 - Routing: `go_router`
-- Local persistence: Hive / Hive Flutter
+- Local persistence: Hive / Hive Flutter (100% local-first; no Firebase or cloud sync)
 - Data classes: Freezed plus JSON serialization and Hive adapters
-- Backend dependencies: Firebase Core/Auth/Firestore/Functions/Storage
-- OCR: `google_generative_ai`, configured via `flutter_dotenv`
 - Maps: `flutter_map`, `latlong2`, `geolocator`
-- Media: `camera`, `image_picker`, `video_player`
-- UI assets: local images, `assets/data/stroke_centers.json`, and `assets/videos/incapacite.mp4`
+- Media: `video_player` with `VideoAssetHelper`
+- Typography: Bundled `Outfit` and `Inter` `.ttf` fonts in `assets/fonts/` (`GoogleFonts.config.allowRuntimeFetching = false`)
+- UI assets: local images, `assets/data/stroke_centers.json`, and `assets/videos/master_*.mp4` + `intro_vite_9x16.mp4`
 
 ## Verified Commands
 
@@ -53,30 +52,29 @@ Last local verification:
 
 Main source directories:
 
-- `lib/main.dart`: initializes Flutter bindings, Hive, adapters, boxes, Firebase, and `ProviderScope`.
-- `lib/app/`: app shell, theme, and router.
+- `lib/main.dart`: initializes Flutter bindings, disables runtime Google Fonts fetching, initializes Hive adapters and boxes, and mounts `ProviderScope`.
+- `lib/app/`: app shell (`MainShell`), theme, and router (`routes.dart`).
 - `lib/app/theme/`: central colors, typography, and `ThemeData`.
-- `lib/core/models/`: Freezed/Hive models for BP readings, stroke centers, and user profile.
+- `lib/core/models/`: Freezed/Hive models for stroke centers and user profile.
 - `lib/core/repositories/`: local repositories over Hive and asset data.
-- `lib/core/services/`: OCR, BP tracker, emergency, and location services.
+- `lib/core/services/`: emergency and location services.
 - `lib/data/local/boxes/hive_boxes.dart`: canonical Hive box names.
 - `lib/features/`: feature-first UI and providers.
-- `test/`: widget tests.
+- `test/`: unit and widget tests.
 - `scripts/`: APK distribution helpers.
 - `android/`, `ios/`, `web/`, `linux/`, `macos/`, `windows/`: platform projects.
 
 Current feature slices:
 
-- `onboarding`: brand, pledge, reflex drill, profile setup.
-- `dashboard`: home screen and BP status card.
+- `onboarding`: intro video, brand, pledge, reflex drill, profile setup.
+- `dashboard`: home screen with 2x2 V.I.T.E. signs grid.
 - `emergency`: long-press SOS button.
-- `bp_tracker`: camera capture and reading review.
-- `vite_guide`: educational V.I.T.E. screens.
-- `map`: stroke center map and details sheet.
+- `vite_guide`: educational V.I.T.E. screens with bundled master videos.
+- `map`: stroke center map, slide-out menu (`MapSideMenu`), and details sheet (`CenterDetailsSheet`).
 - `stories`: video/story feed.
 - `guardians`: Guardian model, repository, and list provider.
 - `profile`: user profile screen/provider.
-- `shared`: reusable calm button.
+- `shared`: reusable `CalmButton` and `ViteVideoPlayer`.
 
 ## Architecture Rules
 
@@ -321,9 +319,9 @@ When the user requests a durable behavior change, record it here or in the relev
 
 ## Child DOX Index
 
-- [DESIGN/AGENTS.md](file:///home/serge/Documents/EWORKFORCE/DEVSpace/VITE_APPv2/DESIGN/AGENTS.md): Product scope, technical architecture, Serene Wave design system, and global development rules.
-- [lib/core/AGENTS.md](file:///home/serge/Documents/EWORKFORCE/DEVSpace/VITE_APPv2/lib/core/AGENTS.md): Domain entities, 100% local Hive repositories, hardware/system services (Emergency, OCR, Location, BP Tracker).
+- [DESIGN/AGENTS.md](file:///home/serge/Documents/EWORKFORCE/DEVSpace/VITE_APPv2/DESIGN/AGENTS.md): Product scope, 100% local-first technical architecture, Serene Wave design system, and global development rules.
+- [lib/core/AGENTS.md](file:///home/serge/Documents/EWORKFORCE/DEVSpace/VITE_APPv2/lib/core/AGENTS.md): Domain entities, 100% local Hive repositories, hardware/system services (`EmergencyService`, `LocationService`), and utilities.
 - [lib/features/AGENTS.md](file:///home/serge/Documents/EWORKFORCE/DEVSpace/VITE_APPv2/lib/features/AGENTS.md): Presentation slices, UI screens, widgets, animations, video integration, and Riverpod providers.
-- Root-owned files: `README.md`, `LICENSE`, `banner.jpg`, `video-thumbnail.jpg`, `pubspec.yaml`, `analysis_options.yaml`, and root-level project documentation.
+- Root-owned files: `README.md`, `pubspec.yaml`, `analysis_options.yaml`, and root-level project documentation.
 
 

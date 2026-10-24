@@ -40,12 +40,11 @@ class VideoAssetHelper {
         throw Exception(err ?? 'Asset initialization error');
       }
       return controller;
-    } catch (assetError, stackTrace) {
+    } catch (assetError) {
       debugPrint(
         'VideoAssetHelper: direct asset loading failed for "$assetPath" ($assetError). '
         'Falling back to local cached file extraction...',
       );
-      debugPrintStack(stackTrace: stackTrace);
     }
 
     // 2. Fallback path: extract asset to temporary cache directory
@@ -80,11 +79,10 @@ class VideoAssetHelper {
         'VideoAssetHelper: successfully initialized via cached file fallback: ${targetFile.path}',
       );
       return fileController;
-    } catch (fallbackError, fallbackStack) {
+    } catch (fallbackError) {
       debugPrint(
         'VideoAssetHelper: fallback file extraction also failed for "$assetPath": $fallbackError',
       );
-      debugPrintStack(stackTrace: fallbackStack);
       rethrow;
     }
   }
