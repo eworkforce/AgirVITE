@@ -85,12 +85,14 @@ class ProfileScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Contacts d'urgence",
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
+                Expanded(
+                  child: Text(
+                    "Mes contacts en cas d'urgence",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                  ),
                 ),
                 IconButton(
                   onPressed: () => _showAddContactDialog(context, ref),
@@ -136,31 +138,9 @@ class ProfileScreen extends ConsumerWidget {
                             color: Colors.white,
                           ),
                         ),
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                contact.name,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            if (isPrimary)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Text(
-                                  'Premier contact',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                          ],
+                        title: Text(
+                          contact.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(contact.phoneNumber),
                         trailing: IconButton(

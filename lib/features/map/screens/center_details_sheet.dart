@@ -58,15 +58,30 @@ class CenterDetailsSheet extends ConsumerWidget {
     await ref.read(emergencyServiceProvider).callCenter(center.phone);
   }
 
+  Future<void> _callSamu(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showExternalActionConfirmOverlay(
+      context: context,
+      title: 'Appeler le SAMU (${EmergencyService.samuNumber}) ?',
+      subtitle:
+          'Lancer un appel d\'urgence direct vers le SAMU (${EmergencyService.samuNumber}).',
+      confirmLabel: 'Appeler SAMU',
+      icon: Icons.local_hospital_rounded,
+      accentColor: AppColors.emergency,
+    );
+    if (!confirmed) return;
+
+    await ref.read(emergencyServiceProvider).callSAMU();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
+        color: Colors.white.withValues(alpha: 0.96),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black12)],
       ),
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +96,7 @@ class CenterDetailsSheet extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Row(
             children: [
               Expanded(
@@ -95,7 +110,8 @@ class CenterDetailsSheet extends ConsumerWidget {
               ),
               if (center.hasScanner)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -103,7 +119,11 @@ class CenterDetailsSheet extends ConsumerWidget {
                   ),
                   child: const Row(
                     children: [
-                      Icon(Icons.check_circle, size: 14, color: AppColors.success),
+                      Icon(
+                        Icons.check_circle,
+                        size: 14,
+                        color: AppColors.success,
+                      ),
                       SizedBox(width: 4),
                       Text(
                         'Scanner',
@@ -134,7 +154,7 @@ class CenterDetailsSheet extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Row(
             children: [
               Expanded(
@@ -144,15 +164,39 @@ class CenterDetailsSheet extends ConsumerWidget {
                   onPressed: () => _launchNavigation(context),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: CalmButton(
-                  text: 'Appeler',
+                  text: 'Appeler Centre',
                   isPrimary: false,
                   onPressed: () => _callCenter(context, ref),
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              key: const Key('sheet_call_samu_button'),
+              onPressed: () => _callSamu(context, ref),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.emergency,
+                side: const BorderSide(color: AppColors.emergency, width: 1.5),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              icon: const Icon(Icons.phone_forwarded_rounded, size: 18),
+              label: const Text(
+                'Appeler aussi le SAMU (185)',
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13.5,
+                ),
+              ),
+            ),
           ),
         ],
       ),

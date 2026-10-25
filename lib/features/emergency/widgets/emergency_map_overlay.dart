@@ -306,6 +306,39 @@ class _EmergencyMapOverlayState extends ConsumerState<EmergencyMapOverlay> {
               ],
             ],
           ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              key: const Key('emergency_call_samu_button'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.emergency,
+                side: const BorderSide(color: AppColors.emergency, width: 1.4),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () async {
+                final confirmed = await showExternalActionConfirmOverlay(
+                  context: context,
+                  title: 'Appeler le SAMU (${EmergencyService.samuNumber}) ?',
+                  subtitle:
+                      'Lancer un appel d\'urgence vers le SAMU (${EmergencyService.samuNumber})',
+                  confirmLabel: 'Appeler SAMU',
+                  icon: Icons.phone_forwarded_rounded,
+                );
+                if (confirmed && mounted) {
+                  await ref.read(emergencyServiceProvider).callSAMU();
+                }
+              },
+              icon: const Icon(Icons.phone_forwarded_rounded, size: 17),
+              label: const Text(
+                'Appeler aussi le SAMU (185)',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
+              ),
+            ),
+          ),
         ],
       ),
     );

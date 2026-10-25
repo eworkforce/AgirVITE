@@ -101,6 +101,8 @@ void main() {
       expect(message, contains('URGENCE VITALE - AVC SUSPECTÉ (Kouadio)'));
       expect(message, contains('CHU de Cocody'));
       expect(message, contains('07 19 68 80 37'));
+      expect(message, contains('Le centre CHU de Cocody est en cours d\'appel'));
+      expect(message.contains('185'), isFalse);
       expect(message, contains('5.340277,-4.013233'));
     });
 
@@ -109,7 +111,7 @@ void main() {
       final message = await service.buildEmergencyMessage();
 
       expect(message, contains('URGENCE VITALE'));
-      expect(message, contains('185'));
+      expect(message.contains('185'), isFalse);
       expect(message.contains('maps.google.com'), isFalse);
     });
   });

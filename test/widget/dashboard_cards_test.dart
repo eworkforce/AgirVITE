@@ -18,7 +18,7 @@ void main() {
 
     // Verify stylized header elements are rendered
     expect(find.text('CHAQUE MINUTE COMPTE'), findsOneWidget);
-    expect(find.text("Comprendre les signes d'alerte"), findsOneWidget);
+    expect(find.text("Reconnaître les signes d'alerte"), findsOneWidget);
     expect(find.text("Les 4 Signes d'Urgence"), findsNothing);
 
     // Verify all 4 letters are rendered

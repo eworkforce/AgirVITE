@@ -18,25 +18,5 @@
     "phone": "07 48 75 43 95",
     "hasScanner": true,
     "isOpen247": true
-  },
-  {
-    "id": "pisam",
-    "name": "PISAM",
-    "address": "Urgences • Av. Jean Mermoz, Cocody, Abidjan",
-    "latitude": 5.340277,
-    "longitude": -4.013233,
-    "phone": "27 22 48 31 12",
-    "hasScanner": true,
-    "isOpen247": true
-  },
-  {
-    "id": "polyclinique_farah",
-    "name": "Polyclinique Farah",
-    "address": "Urgences • Marcory Résidentiel, Abidjan",
-    "latitude": 5.297635,
-    "longitude": -3.982298,
-    "phone": "27 21 75 11 30",
-    "hasScanner": true,
-    "isOpen247": true
   }
 ]

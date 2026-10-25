@@ -29,12 +29,12 @@ class DashboardScreen extends ConsumerWidget {
                 constraints: BoxConstraints(
                   minHeight: constraints.maxHeight,
                 ),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                         // 1. Header with greeting and profile avatar
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -93,9 +93,6 @@ class DashboardScreen extends ConsumerWidget {
                           ],
                         ),
 
-                        // Balanced top spacer so the title + 2x2 grid sit vertically centered
-                        const Spacer(flex: 1),
-
                         // 2. Stylized Editorial Title + 2x2 V.I.T.E. Grid
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -135,11 +132,11 @@ class DashboardScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            // Stylized headline: "Comprendre les signes d'alerte"
+                            // Stylized headline: "Reconnaître les signes d'alerte"
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Text(
-                                "Comprendre les signes d'alerte",
+                                "Reconnaître les signes d'alerte",
                                 textAlign: TextAlign.center,
                                 style: Theme.of(context)
                                     .textTheme
@@ -231,14 +228,12 @@ class DashboardScreen extends ConsumerWidget {
                           ],
                         ),
 
-                        // Balanced bottom spacer + offset for the docked SOS arch
-                        const Spacer(flex: 1),
+                        // Offset for the docked SOS arch
                         const SizedBox(height: 44),
                       ],
                     ),
                   ),
                 ),
-              ),
             );
           },
         ),

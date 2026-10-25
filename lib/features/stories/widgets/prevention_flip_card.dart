@@ -19,6 +19,8 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
   late Animation<double> _animation;
   bool _isFront = true;
 
+  static const Color _titleCrimsonRed = Color(0xFFC62828);
+
   @override
   void initState() {
     super.initState();
@@ -90,6 +92,7 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
     required String assetPath,
     required double imageOpacity,
     required List<Color> gradientColors,
+    required List<double> stops,
   }) {
     return Positioned.fill(
       child: Stack(
@@ -110,7 +113,7 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: gradientColors,
-                stops: const [0.0, 0.48, 1.0],
+                stops: stops,
               ),
             ),
           ),
@@ -128,10 +131,10 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: accent.withValues(alpha: 0.38), width: 2),
+        border: Border.all(color: accent.withValues(alpha: 0.42), width: 2),
         boxShadow: [
           BoxShadow(
-            color: accent.withValues(alpha: 0.14),
+            color: accent.withValues(alpha: 0.16),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -143,15 +146,17 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
         children: [
           _buildSmoothBackgroundImage(
             assetPath: card.imageAsset,
-            imageOpacity: 0.34,
+            imageOpacity: 0.92,
             gradientColors: [
-              Colors.white.withValues(alpha: 0.38),
-              Colors.white.withValues(alpha: 0.86),
-              Colors.white.withValues(alpha: 0.96),
+              Colors.black.withValues(alpha: 0.05),
+              Colors.white.withValues(alpha: 0.18),
+              Colors.white.withValues(alpha: 0.90),
+              Colors.white.withValues(alpha: 0.97),
             ],
+            stops: const [0.0, 0.36, 0.60, 1.0],
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
             child: Column(
               children: [
                 Row(
@@ -163,9 +168,9 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.92),
+                        color: Colors.white.withValues(alpha: 0.94),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: accent.withValues(alpha: 0.3)),
+                        border: Border.all(color: accent.withValues(alpha: 0.4)),
                       ),
                       child: Text(
                         card.stepLabel,
@@ -183,7 +188,7 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.92),
+                        color: Colors.white.withValues(alpha: 0.94),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: const Row(
@@ -209,32 +214,33 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                   ],
                 ),
                 Expanded(
-                  child: Center(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            width: 68,
-                            height: 68,
+                            width: 60,
+                            height: 60,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.92),
+                              color: Colors.white.withValues(alpha: 0.95),
                               border: Border.all(
-                                color: accent.withValues(alpha: 0.35),
+                                color: accent.withValues(alpha: 0.45),
                                 width: 2,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: accent.withValues(alpha: 0.16),
-                                  blurRadius: 12,
+                                  color: Colors.black.withValues(alpha: 0.14),
+                                  blurRadius: 10,
                                 ),
                               ],
                             ),
-                            child: Icon(card.icon, size: 36, color: accent),
+                            child: Icon(card.icon, size: 32, color: accent),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
                           Text(
                             card.title,
                             textAlign: TextAlign.center,
@@ -243,8 +249,8 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                                 .titleLarge
                                 ?.copyWith(
                                   fontWeight: FontWeight.w900,
-                                  color: AppColors.textPrimary,
-                                  fontSize: 20,
+                                  color: _titleCrimsonRed,
+                                  fontSize: 20.5,
                                   height: 1.15,
                                 ),
                           ),
@@ -259,7 +265,7 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                                   color: AppColors.textPrimary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 14,
-                                  height: 1.3,
+                                  height: 1.28,
                                 ),
                           ),
                           const SizedBox(height: 10),
@@ -269,10 +275,10 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.94),
+                              color: Colors.white.withValues(alpha: 0.96),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: accent.withValues(alpha: 0.32),
+                                color: accent.withValues(alpha: 0.38),
                               ),
                             ),
                             child: Text(
@@ -285,12 +291,13 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                               ),
                             ),
                           ),
+                          const SizedBox(height: 4),
                         ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
@@ -298,7 +305,7 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                     horizontal: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.10),
+                    color: AppColors.primary.withValues(alpha: 0.11),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Row(
@@ -360,12 +367,13 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
         children: [
           _buildSmoothBackgroundImage(
             assetPath: card.imageAsset,
-            imageOpacity: 0.14,
+            imageOpacity: 0.25,
             gradientColors: [
-              Colors.white.withValues(alpha: 0.85),
-              Colors.white.withValues(alpha: 0.93),
-              Colors.white.withValues(alpha: 0.97),
+              Colors.white.withValues(alpha: 0.80),
+              Colors.white.withValues(alpha: 0.90),
+              Colors.white.withValues(alpha: 0.95),
             ],
+            stops: const [0.0, 0.5, 1.0],
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
@@ -381,7 +389,7 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: AppColors.primary,
+                          color: _titleCrimsonRed,
                           fontWeight: FontWeight.w900,
                           fontSize: 15,
                         ),
@@ -469,7 +477,7 @@ class _PreventionFlipCardState extends State<PreventionFlipCard>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.90),
+        color: Colors.white.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: color.withValues(alpha: 0.28)),
       ),

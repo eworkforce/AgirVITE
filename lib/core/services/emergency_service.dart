@@ -120,7 +120,7 @@ class EmergencyService {
 
     if (closestCenter != null) {
       message +=
-          "\n🏥 Centre le plus proche : ${closestCenter.name} (${closestCenter.phone})";
+          "\n🏥 Centre d'urgence sélectionné : ${closestCenter.name} (${closestCenter.phone})";
     }
 
     if (customNote != null && customNote.trim().isNotEmpty) {
@@ -132,8 +132,13 @@ class EmergencyService {
           "\n📍 Ma localisation précise : https://maps.google.com/?q=${position.latitude},${position.longitude}";
     }
 
-    message +=
-        "\nSAMU (185) / Centre d'urgence en cours d'appel. Veuillez intervenir ou m'assister au plus vite.";
+    if (closestCenter != null) {
+      message +=
+          "\nLe centre ${closestCenter.name} est en cours d'appel. Veuillez intervenir ou m'assister au plus vite.";
+    } else {
+      message +=
+          "\nUn centre d'urgence AVC est en cours d'appel. Veuillez intervenir ou m'assister au plus vite.";
+    }
     return message;
   }
 

@@ -13,7 +13,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Verify the 2 deck toggles and initial card (Recto)
+      // Verify the 2 deck toggles, header, SIN source footer, and initial card (Recto)
+      expect(find.text('Facteurs de Risque'), findsOneWidget);
+      expect(
+        find.text('Sources : SIN (Société Ivoirienne de Neurologie)'),
+        findsOneWidget,
+      );
       expect(find.text('Les 6 Dangers'), findsOneWidget);
       expect(find.text('Les 6 Bons Réflexes'), findsOneWidget);
       expect(find.text('La Tension Élevée (HTA)'), findsOneWidget);
