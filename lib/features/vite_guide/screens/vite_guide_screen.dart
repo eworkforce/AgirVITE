@@ -15,13 +15,26 @@ class ViteGuideScreen extends ConsumerStatefulWidget {
   ConsumerState<ViteGuideScreen> createState() => _ViteGuideScreenState();
 }
 
-class _ViteGuideScreenState extends ConsumerState<ViteGuideScreen> with SingleTickerProviderStateMixin {
+class _ViteGuideScreenState extends ConsumerState<ViteGuideScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this, initialIndex: widget.initialIndex);
+    _tabController = TabController(
+      length: 4,
+      vsync: this,
+      initialIndex: widget.initialIndex.clamp(0, 3),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant ViteGuideScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialIndex != oldWidget.initialIndex) {
+      _tabController.animateTo(widget.initialIndex.clamp(0, 3));
+    }
   }
 
   @override
@@ -33,9 +46,15 @@ class _ViteGuideScreenState extends ConsumerState<ViteGuideScreen> with SingleTi
   void _nextPage() {
     if (_tabController.index < 3) {
       _tabController.animateTo(_tabController.index + 1);
+    } else if (context.canPop()) {
+      context.pop();
     } else {
-      context.pop(); // Return to dashboard
+      context.go('/dashboard');
     }
+  }
+
+  void _jumpToUrgenceTab() {
+    _tabController.animateTo(3);
   }
 
   @override
@@ -74,9 +93,18 @@ class _ViteGuideScreenState extends ConsumerState<ViteGuideScreen> with SingleTi
       body: TabBarView(
         controller: _tabController,
         children: [
-          VisageScreen(onNext: _nextPage),
-          IncapaciteScreen(onNext: _nextPage),
-          TroubleScreen(onNext: _nextPage),
+          VisageScreen(
+            onNext: _nextPage,
+            onJumpToUrgence: _jumpToUrgenceTab,
+          ),
+          IncapaciteScreen(
+            onNext: _nextPage,
+            onJumpToUrgence: _jumpToUrgenceTab,
+          ),
+          TroubleScreen(
+            onNext: _nextPage,
+            onJumpToUrgence: _jumpToUrgenceTab,
+          ),
           EnUrgenceScreen(onNext: _nextPage),
         ],
       ),

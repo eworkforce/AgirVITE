@@ -59,16 +59,20 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: EnUrgenceScreen(onNext: () {}),
+      ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(
+            body: EnUrgenceScreen(onNext: () {}),
+          ),
         ),
       ),
     );
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('E - En Urgence'), findsOneWidget);
-    expect(find.text('Appelez immédiatement le SAMU (185)'), findsOneWidget);
+    expect(find.text('1 SEUL SIGNE V, I OU T SUFFIT'), findsOneWidget);
+    expect(find.text('Activer le bouton SOS maintenant'), findsOneWidget);
+    expect(find.text('Terminer le Guide'), findsNothing);
     expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(const SizedBox());

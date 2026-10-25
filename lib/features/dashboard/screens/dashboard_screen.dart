@@ -136,18 +136,38 @@ class DashboardScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 8),
                             // Stylized headline: "Comprendre les signes d'alerte"
-                            Text(
-                              "Comprendre les signes d'alerte",
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.primary,
-                                    fontSize: 21,
-                                    letterSpacing: -0.3,
-                                  ),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                "Comprendre les signes d'alerte",
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.primary,
+                                      fontSize: 21,
+                                      letterSpacing: -0.3,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                "Un seul signe V, I ou T suffit → Urgence E",
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: AppColors.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
+                              ),
                             ),
                             const SizedBox(height: 8),
                             // Subtle centered accent bar
@@ -164,7 +184,7 @@ class DashboardScreen extends ConsumerWidget {
                                 borderRadius: BorderRadius.circular(2),
                               ),
                             ),
-                            const SizedBox(height: 18),
+                            const SizedBox(height: 16),
 
                             // 2x2 Action Grid (V.I.T.E.)
                             Row(
