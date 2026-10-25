@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../../app/theme/colors.dart';
 import '../../../core/models/user.dart';
+import '../../../core/utils/phone_number_formatter.dart';
 import '../providers/profile_provider.dart';
 import '../../guardians/models/guardian.dart';
 import '../../guardians/repositories/guardians_repository.dart';
@@ -15,7 +16,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(userProfileProvider);
-    final guardiansAsync = ref.watch(guardiansListProvider);
+    final contactsAsync = ref.watch(guardiansListProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -77,64 +78,94 @@ class ProfileScreen extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, stack) => Text('Erreur: $err'),
             ),
-            
+
             const SizedBox(height: 32),
-            
-            // Guardians Section
+
+            // Emergency Contacts Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Cercle de Vie (Gardiens)",
+                  "Contacts d'urgence",
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
                 ),
                 IconButton(
-                  onPressed: () => _showAddGuardianDialog(context, ref),
+                  onPressed: () => _showAddContactDialog(context, ref),
                   icon: const Icon(Icons.add_circle, color: AppColors.primary, size: 30),
+                  tooltip: 'Ajouter un contact',
                 ),
               ],
             ),
             const SizedBox(height: 8),
             const Text(
-              "Ces personnes recevront une alerte WhatsApp avec votre position en cas d'urgence.",
+              "Votre premier contact reçoit automatiquement un SMS en arrière-plan et un message WhatsApp avec votre position GPS en cas d'urgence.",
               style: TextStyle(color: Colors.grey, fontSize: 13),
             ),
             const SizedBox(height: 16),
-            
-            guardiansAsync.when(
-              data: (guardians) {
-                if (guardians.isEmpty) {
+
+            contactsAsync.when(
+              data: (contacts) {
+                if (contacts.isEmpty) {
                   return const Center(
                     child: Padding(
                       padding: EdgeInsets.all(20),
-                      child: Text("Aucun gardien ajouté."),
+                      child: Text("Aucun contact ajouté."),
                     ),
                   );
                 }
-                
+
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: guardians.length,
+                  itemCount: contacts.length,
                   itemBuilder: (context, index) {
-                    final guardian = guardians[index];
+                    final contact = contacts[index];
+                    final isPrimary = index == 0;
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 2,
                       child: ListTile(
-                        leading: const CircleAvatar(
-                          backgroundColor: AppColors.secondary,
-                          child: Icon(Icons.security, color: Colors.white),
+                        leading: CircleAvatar(
+                          backgroundColor: isPrimary ? AppColors.primary : AppColors.secondary,
+                          child: Icon(
+                            isPrimary ? Icons.star_rounded : Icons.contact_phone_rounded,
+                            color: Colors.white,
+                          ),
                         ),
-                        title: Text(guardian.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(guardian.phoneNumber),
+                        title: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                contact.name,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            if (isPrimary)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'Premier contact',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        subtitle: Text(contact.phoneNumber),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.red),
-                          onPressed: () => _confirmDeleteGuardian(context, ref, guardian),
+                          onPressed: () => _confirmDeleteContact(context, ref, contact),
                         ),
                       ),
                     );
@@ -144,24 +175,20 @@ class ProfileScreen extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, stack) => Text('Erreur: $err'),
             ),
-            
+
             const SizedBox(height: 32),
-            
-            // App Info / Logout (Reset)
+
+            // App Info
             const Divider(),
             ListTile(
               leading: const Icon(Icons.info_outline),
               title: const Text('À propos de Agir V.I.T.E.'),
-              onTap: () {
-                // Show license or version
-              },
+              onTap: () {},
             ),
-             ListTile(
+            ListTile(
               leading: const Icon(Icons.privacy_tip_outlined),
               title: const Text('Confidentialité & Données'),
-              onTap: () {
-                 // Show privacy policy
-              },
+              onTap: () {},
             ),
           ],
         ),
@@ -169,25 +196,28 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _showAddGuardianDialog(BuildContext context, WidgetRef ref) {
+  void _showAddContactDialog(BuildContext context, WidgetRef ref) {
     final nameController = TextEditingController();
     final phoneController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Ajouter un Gardien"),
+        title: const Text("Ajouter un contact"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: "Nom"),
+              decoration: const InputDecoration(labelText: "Nom du contact"),
             ),
             TextField(
               controller: phoneController,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(labelText: "Téléphone (WhatsApp)"),
+              decoration: const InputDecoration(
+                labelText: "Téléphone (SMS & WhatsApp)",
+                hintText: "Ex: 07 01 02 03 04",
+              ),
             ),
           ],
         ),
@@ -198,14 +228,19 @@ class ProfileScreen extends ConsumerWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              if (nameController.text.isNotEmpty && phoneController.text.isNotEmpty) {
-                final guardian = Guardian(
+              if (nameController.text.trim().isNotEmpty &&
+                  phoneController.text.trim().isNotEmpty) {
+                final normalizedPhone = PhoneNumberFormatter.normalize(
+                  phoneController.text.trim(),
+                  includePlus: true,
+                );
+                final contact = Guardian(
                   id: const Uuid().v4(),
                   name: nameController.text.trim(),
-                  phoneNumber: phoneController.text.trim(),
-                  relation: "Contact",
+                  phoneNumber: normalizedPhone,
+                  relation: "Contact d'urgence",
                 );
-                ref.read(guardiansRepositoryProvider).addGuardian(guardian);
+                ref.read(guardiansRepositoryProvider).addGuardian(contact);
                 Navigator.pop(context);
               }
             },
@@ -217,12 +252,12 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _confirmDeleteGuardian(BuildContext context, WidgetRef ref, Guardian guardian) {
+  void _confirmDeleteContact(BuildContext context, WidgetRef ref, Guardian contact) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Supprimer ?"),
-        content: Text("Voulez-vous retirer ${guardian.name} de votre cercle de vie ?"),
+        content: Text("Voulez-vous retirer ${contact.name} de vos contacts d'urgence ?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -230,7 +265,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () {
-              ref.read(guardiansRepositoryProvider).removeGuardian(guardian.id);
+              ref.read(guardiansRepositoryProvider).removeGuardian(contact.id);
               Navigator.pop(context);
             },
             child: const Text("Oui, supprimer", style: TextStyle(color: Colors.red)),

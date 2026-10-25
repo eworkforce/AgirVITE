@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../app/theme/colors.dart';
-import '../../../core/services/emergency_service.dart';
-import '../../guardians/providers/guardians_provider.dart';
+
+/// Incremented each time the user completes the 2-second SOS hold gesture,
+/// allowing [MapScreen] to react even when already visible.
+final emergencyTriggerProvider = StateProvider<int>((ref) => 0);
 
 class SOSButton extends ConsumerStatefulWidget {
   const SOSButton({super.key});
@@ -11,7 +15,8 @@ class SOSButton extends ConsumerStatefulWidget {
   ConsumerState<SOSButton> createState() => _SOSButtonState();
 }
 
-class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProviderStateMixin {
+class _SOSButtonState extends ConsumerState<SOSButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _isPressed = false;
 
@@ -22,7 +27,7 @@ class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProvider
       vsync: this,
       duration: const Duration(seconds: 2), // 2 seconds long press
     );
-    
+
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _triggerEmergency();
@@ -33,27 +38,14 @@ class _SOSButtonState extends ConsumerState<SOSButton> with SingleTickerProvider
   void _triggerEmergency() {
     setState(() => _isPressed = false);
     _controller.reset();
-    
-    // 1. Get registered guardians
-    final guardiansAsync = ref.read(guardiansListProvider);
-    final numbers = guardiansAsync.valueOrNull?.map((g) => g.phoneNumber).toList() ?? [];
-    
-    // 2. Immediate native dialing to SAMU (185) - Never blocked
-    ref.read(emergencyServiceProvider).callSAMU().catchError((error) {
-      debugPrint('SAMU Dialing error: $error');
-      return false;
-    });
+    HapticFeedback.heavyImpact();
 
-    // 3. Alert guardians via WhatsApp (primary guardian first) with auto SMS fallback
-    ref.read(emergencyServiceProvider).sendWhatsAppAlert(numbers);
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Appel SAMU 185 déclenché ! Alerte gardiens en cours...'),
-        backgroundColor: AppColors.emergency,
-        duration: Duration(seconds: 5),
-      ),
-    );
+    // Increment trigger state and navigate directly to the Map in emergency mode.
+    // MapScreen zooms onto the closest stroke center, automatically initiates
+    // the phone call to that center, and sends the background SMS + WhatsApp
+    // alert to the First Contact in parallel.
+    ref.read(emergencyTriggerProvider.notifier).state++;
+    context.go('/map?emergency=true');
   }
 
   @override

@@ -22,10 +22,11 @@ Owns domain entities, local Hive repositories, hardware/system services (`Emerge
 2. **Persistence Rules:**
    - 100% local-first storage using Hive.
    - Do not add remote cloud sync dependencies or external storage hooks.
-3. **Emergency Service:**
-   - SAMU call (`185`) must never be blocked by secondary failures and returns a boolean launch result instead of throwing raw strings.
-   - WhatsApp alert must directly target the primary guardian (`https://wa.me/<normalized_phone>?text=...`) with international formatting (`+225...`).
-   - Native SMS broadcast must provide fallback to all registered guardians.
+3. **Emergency Service (`EmergencyService`):**
+   - `findClosestCenter(centers, position)` computes the closest `StrokeCenter` using GPS coordinates (or defaults to Abidjan `5.340277, -4.013233` if GPS is unavailable).
+   - `callCenter(phoneNumber)` invokes native Android `callNumberDirectly` (`ACTION_CALL`) via `MethodChannel('com.avcespoir.agir_vite/emergency')` with `tel:` URI fallback.
+   - `sendHeadlessSms(phoneNumber, ...)` invokes native Android `sendDirectSms` (`SmsManager.sendMultipartTextMessage`) via `MethodChannel('com.avcespoir.agir_vite/emergency')` to send the emergency SMS automatically and headlessly in the background to the First Contact.
+   - `sendWhatsAppAlert(phoneNumbers, ...)` uses `whatsapp://send?phone=225...&text=...` (with `https://wa.me/225...` fallback) pre-addressed to the First Contact's normalized phone number so no manual recipient selection is required.
 4. **Location & Resource Safety:**
    - Streams from `LocationService` must be cancellable and safe for single-frame or continuous GPS polling.
 

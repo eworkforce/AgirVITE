@@ -71,7 +71,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/map',
-            builder: (context, state) => const MapScreen(),
+            builder: (context, state) {
+              final isEmergency =
+                  state.uri.queryParameters['emergency'] == 'true';
+              return MapScreen(autoTriggerEmergency: isEmergency);
+            },
           ),
           GoRoute(
             path: '/stories',

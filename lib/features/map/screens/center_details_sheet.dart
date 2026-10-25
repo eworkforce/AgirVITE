@@ -1,56 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:latlong2/latlong.dart';
 import '../../../app/theme/colors.dart';
 import '../../../core/models/stroke_center.dart';
+import '../../../core/services/emergency_service.dart';
+import '../../emergency/widgets/emergency_map_overlay.dart';
 import '../../shared/widgets/calm_button.dart';
 
-class CenterDetailsSheet extends StatelessWidget {
+class CenterDetailsSheet extends ConsumerWidget {
   final StrokeCenter center;
 
   const CenterDetailsSheet({super.key, required this.center});
 
-  Future<void> _launchNavigation() async {
-    // 1. Try Google Maps App Deep Link (Driving Mode)
+  Future<void> _launchNavigation(BuildContext context) async {
+    final confirmed = await showExternalActionConfirmOverlay(
+      context: context,
+      title: 'Itinéraire vers ${center.name} ?',
+      subtitle: 'Ouvrir Google Maps pour vous guider vers ${center.address}.',
+      confirmLabel: 'Y Aller',
+      icon: Icons.directions_car_rounded,
+      accentColor: AppColors.primary,
+    );
+    if (!confirmed) return;
+
     final Uri googleMapsAppUri = Uri.parse(
-        "google.navigation:q=${center.latitude},${center.longitude}&mode=d");
-    
-    // 2. Fallback Web URL
+      "google.navigation:q=${center.latitude},${center.longitude}&mode=d",
+    );
     final Uri googleMapsWebUri = Uri.parse(
-        "https://www.google.com/maps/dir/?api=1&destination=${center.latitude},${center.longitude}&travelmode=driving");
+      "https://www.google.com/maps/dir/?api=1&destination=${center.latitude},${center.longitude}&travelmode=driving",
+    );
 
     try {
       if (await canLaunchUrl(googleMapsAppUri)) {
         await launchUrl(googleMapsAppUri);
       } else {
-        await launchUrl(googleMapsWebUri, mode: LaunchMode.externalApplication);
+        await launchUrl(
+          googleMapsWebUri,
+          mode: LaunchMode.externalApplication,
+        );
       }
     } catch (e) {
       debugPrint('Could not launch maps: $e');
     }
   }
 
-  Future<void> _callCenter() async {
-    final Uri telUri = Uri(scheme: 'tel', path: center.phone.replaceAll(' ', ''));
-    if (await canLaunchUrl(telUri)) {
-      await launchUrl(telUri);
-    }
+  Future<void> _callCenter(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showExternalActionConfirmOverlay(
+      context: context,
+      title: 'Appeler ${center.name} ?',
+      subtitle: 'Lancer un appel téléphonique vers le ${center.phone}.',
+      confirmLabel: 'Appeler',
+      icon: Icons.phone_in_talk_rounded,
+      accentColor: AppColors.emergency,
+    );
+    if (!confirmed) return;
+
+    await ref.read(emergencyServiceProvider).callCenter(center.phone);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black12)],
+        color: Colors.white.withValues(alpha: 0.95),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black12)],
       ),
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Drag Handle
           Center(
             child: Container(
               width: 40,
@@ -62,8 +82,6 @@ class CenterDetailsSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-
-          // Title & Badge
           Row(
             children: [
               Expanded(
@@ -101,30 +119,29 @@ class CenterDetailsSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-
-          // Address
           Row(
             children: [
               const Icon(Icons.location_on, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  center.address,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+                  '${center.address} • ${center.phone}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.grey[700]),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 24),
-
-          // Actions
           Row(
             children: [
               Expanded(
                 child: CalmButton(
                   text: 'Y Aller',
                   isPrimary: true,
-                  onPressed: _launchNavigation,
+                  onPressed: () => _launchNavigation(context),
                 ),
               ),
               const SizedBox(width: 16),
@@ -132,7 +149,7 @@ class CenterDetailsSheet extends StatelessWidget {
                 child: CalmButton(
                   text: 'Appeler',
                   isPrimary: false,
-                  onPressed: _callCenter,
+                  onPressed: () => _callCenter(context, ref),
                 ),
               ),
             ],

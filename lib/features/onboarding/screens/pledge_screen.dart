@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/theme/colors.dart';
+import '../widgets/onboarding_progress_header.dart';
 
 class PledgeScreen extends StatelessWidget {
   const PledgeScreen({super.key});
@@ -11,10 +12,13 @@ class PledgeScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              OnboardingProgressHeader(
+                currentStep: 1,
+                onBack: () => context.go('/onboarding/brand'),
+              ),
               const Spacer(),
               Text(
                 "Contre l'AVC,",
@@ -40,7 +44,7 @@ class PledgeScreen extends StatelessWidget {
                     ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 40),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

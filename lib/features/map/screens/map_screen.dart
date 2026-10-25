@@ -8,7 +8,11 @@ import 'package:latlong2/latlong.dart';
 import '../../../app/theme/colors.dart';
 import '../../../core/models/stroke_center.dart';
 import '../../../core/repositories/stroke_centers_repository.dart';
+import '../../../core/services/emergency_service.dart';
 import '../../../core/services/location_service.dart';
+import '../../emergency/widgets/emergency_map_overlay.dart';
+import '../../emergency/widgets/sos_button.dart';
+import '../widgets/center_map_marker.dart';
 import '../widgets/map_side_menu.dart';
 import 'center_details_sheet.dart';
 
@@ -17,7 +21,12 @@ final strokeCentersProvider = FutureProvider<List<StrokeCenter>>((ref) async {
 });
 
 class MapScreen extends ConsumerStatefulWidget {
-  const MapScreen({super.key});
+  final bool autoTriggerEmergency;
+
+  const MapScreen({
+    super.key,
+    this.autoTriggerEmergency = false,
+  });
 
   @override
   ConsumerState<MapScreen> createState() => _MapScreenState();
@@ -27,14 +36,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   final MapController _mapController = MapController();
   StreamSubscription<Position>? _positionSub;
   StrokeCenter? _selectedCenter;
+  StrokeCenter? _emergencyCenter;
   Position? _currentPosition;
   bool _isFollowingUser = true;
   bool _isMenuOpen = false;
+  bool _didHandleInitialEmergency = false;
 
   @override
   void initState() {
     super.initState();
     _startLocationUpdates();
+  }
+
+  @override
+  void didUpdateWidget(covariant MapScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.autoTriggerEmergency && !oldWidget.autoTriggerEmergency) {
+      final centers = ref.read(strokeCentersProvider).valueOrNull;
+      if (centers != null && centers.isNotEmpty) {
+        _activateEmergencyZoom(centers);
+      }
+    }
   }
 
   void _startLocationUpdates() {
@@ -44,13 +66,37 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         .listen((position) {
       if (mounted) {
         setState(() => _currentPosition = position);
-        if (_isFollowingUser) {
+        if (_isFollowingUser && _emergencyCenter == null) {
           _mapController.move(
             LatLng(position.latitude, position.longitude),
             _mapController.camera.zoom,
           );
         }
       }
+    });
+  }
+
+  void _activateEmergencyZoom(List<StrokeCenter> centers) {
+    final closest = ref
+        .read(emergencyServiceProvider)
+        .findClosestCenter(centers, position: _currentPosition);
+    if (closest == null || !mounted) return;
+
+    setState(() {
+      _selectedCenter = closest;
+      _emergencyCenter = closest;
+      _isFollowingUser = false;
+      _isMenuOpen = false;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      try {
+        _mapController.move(
+          LatLng(closest.latitude, closest.longitude),
+          16.0,
+        );
+      } catch (_) {}
     });
   }
 
@@ -65,13 +111,35 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Widget build(BuildContext context) {
     final strokeCentersAsync = ref.watch(strokeCentersProvider);
 
+    ref.listen<int>(emergencyTriggerProvider, (previous, next) {
+      final centers = strokeCentersAsync.valueOrNull;
+      if (centers != null && centers.isNotEmpty) {
+        _activateEmergencyZoom(centers);
+      }
+    });
+
+    if (widget.autoTriggerEmergency &&
+        !_didHandleInitialEmergency &&
+        strokeCentersAsync.hasValue &&
+        strokeCentersAsync.value!.isNotEmpty) {
+      _didHandleInitialEmergency = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _activateEmergencyZoom(strokeCentersAsync.value!);
+        }
+      });
+    }
+
     return Scaffold(
       body: Stack(
         children: [
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              initialCenter: const LatLng(5.340277, -4.013233), // Abidjan default
+              initialCenter: const LatLng(
+                EmergencyService.defaultLatitude,
+                EmergencyService.defaultLongitude,
+              ),
               initialZoom: 13.0,
               minZoom: 1.0,
               onPositionChanged: (position, hasGesture) {
@@ -125,7 +193,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           Positioned(
             right: 16,
-            bottom: 150,
+            bottom: _emergencyCenter != null ? 290 : 150,
             child: FloatingActionButton(
               mini: true,
               backgroundColor: Colors.white,
@@ -163,6 +231,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
             ),
           ),
+          if (_emergencyCenter != null)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: EmergencyMapOverlay(
+                key: ValueKey(_emergencyCenter!.id),
+                closestCenter: _emergencyCenter!,
+                currentPosition: _currentPosition,
+                onClose: () => setState(() => _emergencyCenter = null),
+              ),
+            ),
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -187,23 +267,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   List<Marker> _buildCenterMarkers(List<StrokeCenter> centers) {
-    StrokeCenter? closest;
-    double minDistance = double.infinity;
-
-    if (_currentPosition != null) {
-      for (final center in centers) {
-        final dist = Geolocator.distanceBetween(
-          _currentPosition!.latitude,
-          _currentPosition!.longitude,
-          center.latitude,
-          center.longitude,
-        );
-        if (dist < minDistance) {
-          minDistance = dist;
-          closest = center;
-        }
-      }
-    }
+    final closest = ref
+        .read(emergencyServiceProvider)
+        .findClosestCenter(centers, position: _currentPosition);
 
     return centers.map((center) {
       final dist = _currentPosition != null
@@ -215,65 +281,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             )
           : 0.0;
       final distKm = (dist / 1000).toStringAsFixed(1);
-      final isSelected = center == _selectedCenter;
-      final isClosest = center == closest;
 
       return Marker(
         point: LatLng(center.latitude, center.longitude),
         width: 140,
         height: 90,
-        child: GestureDetector(
+        child: CenterMapMarker(
+          center: center,
+          distKm: distKm,
+          isSelected: center == _selectedCenter,
+          isClosest: center == closest,
           onTap: () => _selectCenter(center),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isClosest ? Colors.green.shade50 : Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isClosest
-                        ? Colors.green
-                        : (isSelected ? AppColors.primary : Colors.grey.shade300),
-                    width: isClosest || isSelected ? 2 : 1,
-                  ),
-                  boxShadow: const [BoxShadow(blurRadius: 2, color: Colors.black12)],
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      center.name,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: isClosest ? Colors.green.shade800 : Colors.black87,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      "$distKm km${isClosest ? ' (Proche)' : ''}",
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: isClosest ? FontWeight.w900 : FontWeight.normal,
-                        color: isClosest ? Colors.green : Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 2),
-              Icon(
-                Icons.location_on,
-                color: isClosest
-                    ? Colors.green
-                    : (isSelected ? AppColors.primary : Colors.red),
-                size: isSelected || isClosest ? 35 : 30,
-              ),
-            ],
-          ),
         ),
       );
     }).toList();

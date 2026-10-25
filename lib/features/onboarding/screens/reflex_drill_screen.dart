@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/theme/colors.dart';
+import '../widgets/onboarding_progress_header.dart';
 
 class ReflexDrillScreen extends ConsumerStatefulWidget {
   const ReflexDrillScreen({super.key});
@@ -43,10 +44,10 @@ class _ReflexDrillScreenState extends ConsumerState<ReflexDrillScreen> {
     _timer?.cancel();
     _isComplete = true;
     _progress = 1.0;
-    
+
     // Haptic feedback
     HapticFeedback.heavyImpact();
-    
+
     if (mounted) {
       // Navigate to Profile Setup
       context.go('/onboarding/profile');
@@ -65,10 +66,14 @@ class _ReflexDrillScreenState extends ConsumerState<ReflexDrillScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              OnboardingProgressHeader(
+                currentStep: 2,
+                onBack: () => context.go('/onboarding/pledge'),
+              ),
               const Spacer(),
               Text(
                 "Le Réflexe V.I.T.E.",
@@ -77,14 +82,14 @@ class _ReflexDrillScreenState extends ConsumerState<ReflexDrillScreen> {
                       fontWeight: FontWeight.bold,
                     ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Text(
-                "En cas d'urgence, maintenez le bouton appuyé pendant 2 secondes.",
+                "En cas d'urgence, maintenez le bouton SOS appuyé pendant 2 secondes pour localiser et appeler le centre le plus proche tout en alertant votre premier contact.",
                 style: Theme.of(context).textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),
               const Spacer(),
-              
+
               // SOS Button Simulation
               GestureDetector(
                 onTapDown: (_) => _startPress(),
@@ -98,7 +103,7 @@ class _ReflexDrillScreenState extends ConsumerState<ReflexDrillScreen> {
                     color: AppColors.emergency,
                     boxShadow: [
                       BoxShadow(
-                  color: AppColors.emergency.withValues(alpha: 0.3),
+                        color: AppColors.emergency.withValues(alpha: 0.3),
                         blurRadius: 20,
                         spreadRadius: 5,
                         offset: const Offset(0, 10),
@@ -137,14 +142,13 @@ class _ReflexDrillScreenState extends ConsumerState<ReflexDrillScreen> {
                   ),
                 ),
               ),
-              
+
               const Spacer(),
-              // Disable "skip" behavior implicitly by not providing another button
               Text(
-                "Appuyez longuement pour terminer",
+                "Appuyez longuement pour continuer",
                 style: Theme.of(context).textTheme.labelSmall,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
             ],
           ),
         ),

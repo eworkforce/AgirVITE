@@ -2,6 +2,10 @@
     <!-- Location Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <!-- Emergency Direct Call & Headless Background SMS Permissions -->
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
     
     <!-- Internet (Default, but good to be explicit for video/maps) -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -44,15 +48,24 @@
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
-        <!-- Phone Dialer -->
+        <!-- Phone Dialer & Direct Call -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="tel" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
             <data android:scheme="tel" />
         </intent>
         <!-- SMS -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="sms" />
+        </intent>
+        <!-- Direct WhatsApp Deep Link -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="whatsapp" />
         </intent>
         <!-- Web/WhatsApp -->
         <intent>
