@@ -31,10 +31,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 child: IntrinsicHeight(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 16.0,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 24.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -55,14 +52,22 @@ class DashboardScreen extends ConsumerWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    firstName.isNotEmpty ? 'Bonjour, $firstName' : 'Bonjour,',
-                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    firstName.isNotEmpty
+                                        ? 'Bonjour, $firstName'
+                                        : 'Bonjour,',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
                                   Text(
                                     'Reconnaître les signes d\'un AVC',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
                                           color: AppColors.textSecondary,
                                         ),
                                   ),
@@ -74,7 +79,8 @@ class DashboardScreen extends ConsumerWidget {
                               icon: Container(
                                 padding: const EdgeInsets.all(9),
                                 decoration: BoxDecoration(
-                                  color: AppColors.secondary.withValues(alpha: 0.3),
+                                  color: AppColors.secondary
+                                      .withValues(alpha: 0.3),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
@@ -87,83 +93,107 @@ class DashboardScreen extends ConsumerWidget {
                           ],
                         ),
 
-                        // Flexible top spacer to balance content vertically
-                        const Spacer(),
+                        const SizedBox(height: 20),
 
-                        // 2. Centered Section: Title & 4 V.I.T.E. Signs Grid
+                        // 2. Sober Info Banner (replaces empty space & redundant title)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.18),
+                              width: 1.2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.06),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 4,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  "Chaque minute compte — Comprendre les signes d'alerte",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.textPrimary,
+                                        height: 1.3,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        // 3. 2x2 Action Grid (V.I.T.E.)
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                Container(
-                                  width: 4,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary,
-                                    borderRadius: BorderRadius.circular(2),
+                                Expanded(
+                                  child: _ViteCard(
+                                    letter: 'V',
+                                    imagePath: 'assets/images/GuideVite1.jpeg',
+                                    onTap: () => _goToViteTab(context, 0),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Les 4 Signes d\'Urgence',
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
-                                      ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _ViteCard(
+                                    letter: 'I',
+                                    imagePath:
+                                        'assets/images/incapacite_arm_ci.jpg',
+                                    onTap: () => _goToViteTab(context, 1),
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 16),
-
-                            // 2x2 Action Grid (V.I.T.E.)
-                            Column(
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _ViteCard(
-                                        letter: 'V',
-                                        imagePath: 'assets/images/GuideVite1.jpeg',
-                                        onTap: () => _goToViteTab(context, 0),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: _ViteCard(
-                                        letter: 'I',
-                                        imagePath: 'assets/images/incapacite_arm_ci.jpg',
-                                        onTap: () => _goToViteTab(context, 1),
-                                      ),
-                                    ),
-                                  ],
+                                Expanded(
+                                  child: _ViteCard(
+                                    letter: 'T',
+                                    imagePath:
+                                        'assets/images/trouble_parole_ci.jpg',
+                                    onTap: () => _goToViteTab(context, 2),
+                                  ),
                                 ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _ViteCard(
-                                        letter: 'T',
-                                        imagePath: 'assets/images/trouble_parole_ci.jpg',
-                                        onTap: () => _goToViteTab(context, 2),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: _ViteCard(
-                                        letter: 'E',
-                                        imagePath: 'assets/images/Centre1.jpeg',
-                                        onTap: () => _goToViteTab(context, 3),
-                                      ),
-                                    ),
-                                  ],
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _ViteCard(
+                                    letter: 'E',
+                                    imagePath: 'assets/images/Centre1.jpeg',
+                                    onTap: () => _goToViteTab(context, 3),
+                                  ),
                                 ),
                               ],
                             ),
                           ],
                         ),
 
-                        // Flexible bottom spacer to balance content vertically
                         const Spacer(),
                       ],
                     ),
