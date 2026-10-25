@@ -28,25 +28,27 @@ class MockLocationService implements LocationService {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('EmergencyService', () {
     const sampleCenters = [
       StrokeCenter(
         id: 'chu_cocody',
         name: 'CHU de Cocody',
-        address: 'Cocody, Abidjan',
-        latitude: 5.3561,
-        longitude: -3.9878,
-        phone: '+225 27 22 44 91 00',
+        address: 'Alerte Thrombolyse • Bd de l\'Université, Cocody, Abidjan',
+        latitude: 5.347395,
+        longitude: -3.995982,
+        phone: '07 19 68 80 37',
         hasScanner: true,
         isOpen247: true,
       ),
       StrokeCenter(
-        id: 'chu_bouake',
-        name: 'CHU de Bouaké',
-        address: 'Bouaké',
-        latitude: 7.6939,
-        longitude: -5.0308,
-        phone: '+225 27 31 63 21 90',
+        id: 'chr_bouake',
+        name: 'CHR de Bouaké',
+        address: 'Alerte Thrombolyse • Quartier Commerce, Bouaké',
+        latitude: 7.685000,
+        longitude: -5.025000,
+        phone: '07 48 75 43 95',
         hasScanner: true,
         isOpen247: true,
       ),
@@ -54,8 +56,8 @@ void main() {
 
     test('findClosestCenter returns closest center to user GPS position', () {
       final positionNearBouake = Position(
-        longitude: -5.0300,
-        latitude: 7.6900,
+        longitude: -5.0250,
+        latitude: 7.6850,
         timestamp: DateTime.now(),
         accuracy: 5.0,
         altitude: 10.0,
@@ -73,7 +75,7 @@ void main() {
       );
 
       expect(closest, isNotNull);
-      expect(closest!.id, equals('chu_bouake'));
+      expect(closest!.id, equals('chr_bouake'));
     });
 
     test('buildEmergencyMessage includes userName, closestCenter, and GPS coordinates', () async {
@@ -98,7 +100,7 @@ void main() {
 
       expect(message, contains('URGENCE VITALE - AVC SUSPECTÉ (Kouadio)'));
       expect(message, contains('CHU de Cocody'));
-      expect(message, contains('+225 27 22 44 91 00'));
+      expect(message, contains('07 19 68 80 37'));
       expect(message, contains('5.340277,-4.013233'));
     });
 

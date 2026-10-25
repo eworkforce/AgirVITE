@@ -179,6 +179,14 @@ class MapSideMenu extends StatelessWidget {
                         closest.name,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      Text(
+                        'Tél : ${closest.phone}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       SizedBox(
                         width: double.infinity,
@@ -218,6 +226,8 @@ class MapSideMenu extends StatelessWidget {
                   distanceText = "${(dist / 1000).toStringAsFixed(1)} km";
                 }
 
+                final serviceLine = center.address.split('•').first.trim();
+
                 return ListTile(
                   tileColor: isClosest
                       ? Colors.green.withValues(alpha: 0.1)
@@ -237,21 +247,33 @@ class MapSideMenu extends StatelessWidget {
                       fontSize: 14,
                       color: isClosest ? Colors.green.shade800 : Colors.black87,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  subtitle: distanceText != null
-                      ? Text(
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$serviceLine : ${center.phone}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      if (distanceText != null)
+                        Text(
                           "$distanceText${isClosest ? ' (Le plus proche)' : ''}",
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11.5,
                             color: isClosest ? Colors.green : Colors.black54,
                             fontWeight: isClosest
                                 ? FontWeight.bold
                                 : FontWeight.normal,
                           ),
-                        )
-                      : null,
+                        ),
+                    ],
+                  ),
                   onTap: () => onSelect(center),
                 );
               },

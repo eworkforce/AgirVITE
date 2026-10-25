@@ -1,71 +1,41 @@
 [
   {
-    "id": "1",
-    "name": "Polyclinique Internationale Sainte Anne-Marie (PISAM)",
-    "address": "Avenue Jean Mermoz, Cocody, Abidjan",
-    "latitude": 5.340277,
-    "longitude": -4.013233,
-    "phone": "+225 27 22 48 31 31",
-    "hasScanner": true,
-    "isOpen247": true
-  },
-  {
-    "id": "2",
+    "id": "chu_cocody",
     "name": "CHU de Cocody",
-    "address": "Boulevard de l'Université, Cocody, Abidjan",
+    "address": "Alerte Thrombolyse • Bd de l'Université, Cocody, Abidjan",
     "latitude": 5.347395,
     "longitude": -3.995982,
-    "phone": "+225 27 22 44 90 38",
+    "phone": "07 19 68 80 37",
     "hasScanner": true,
     "isOpen247": true
   },
   {
-    "id": "3",
-    "name": "CHU de Treichville",
-    "address": "Boulevard de Marseille, Treichville, Abidjan",
-    "latitude": 5.293482,
-    "longitude": -4.005548,
-    "phone": "+225 27 21 24 91 22",
-    "hasScanner": true,
-    "isOpen247": true
-  },
-  {
-    "id": "4",
-    "name": "Polyclinique Farah",
-    "address": "Marcory Résidentiel, Abidjan",
-    "latitude": 5.297635,
-    "longitude": -3.982298,
-    "phone": "+225 27 21 26 00 92",
-    "hasScanner": true,
-    "isOpen247": true
-  },
-  {
-    "id": "5",
-    "name": "Hôpital Mère-Enfant de Bingerville",
-    "address": "Bingerville, Route de Eloka",
-    "latitude": 5.360172,
-    "longitude": -3.888765,
-    "phone": "+225 27 22 51 15 00",
-    "hasScanner": true,
-    "isOpen247": true
-  },
-  {
-    "id": "6",
-    "name": "CHU de Bouaké",
-    "address": "Bouaké, Centre",
-    "latitude": 7.692000,
-    "longitude": -5.030000,
-    "phone": "+225 27 31 63 34 65",
-    "hasScanner": true,
-    "isOpen247": true
-  },
-  {
-    "id": "7",
+    "id": "chr_bouake",
     "name": "CHR de Bouaké",
-    "address": "Bouaké, Quartier Commerce",
+    "address": "Alerte Thrombolyse • Quartier Commerce, Bouaké",
     "latitude": 7.685000,
     "longitude": -5.025000,
-    "phone": "+225 27 31 63 29 33",
+    "phone": "07 48 75 43 95",
+    "hasScanner": true,
+    "isOpen247": true
+  },
+  {
+    "id": "pisam",
+    "name": "PISAM",
+    "address": "Urgences • Av. Jean Mermoz, Cocody, Abidjan",
+    "latitude": 5.340277,
+    "longitude": -4.013233,
+    "phone": "27 22 48 31 12",
+    "hasScanner": true,
+    "isOpen247": true
+  },
+  {
+    "id": "polyclinique_farah",
+    "name": "Polyclinique Farah",
+    "address": "Urgences • Marcory Résidentiel, Abidjan",
+    "latitude": 5.297635,
+    "longitude": -3.982298,
+    "phone": "27 21 75 11 30",
     "hasScanner": true,
     "isOpen247": true
   }
