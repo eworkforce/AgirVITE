@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import '../../../app/theme/colors.dart';
 import '../../../core/utils/video_asset_helper.dart';
+import '../../vite_guide/widgets/vite_voice_guide_button.dart';
 import 'vite_video_theater_modal.dart';
 
 class ViteVideoPlayer extends StatefulWidget {
@@ -35,7 +36,18 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
   @override
   void initState() {
     super.initState();
+    viteVoiceGuideActiveNotifier.addListener(_onVoiceGuideStateChanged);
     _initializePlayer();
+  }
+
+  void _onVoiceGuideStateChanged() {
+    final controller = _controller;
+    if (controller == null || !_isInitialized || !mounted) return;
+    if (viteVoiceGuideActiveNotifier.value) {
+      controller.setVolume(0.0);
+    } else if (!_isMuted) {
+      controller.setVolume(1.0);
+    }
   }
 
   @override
@@ -163,6 +175,7 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
 
   @override
   void dispose() {
+    viteVoiceGuideActiveNotifier.removeListener(_onVoiceGuideStateChanged);
     _controller?.removeListener(_videoListener);
     _controller?.dispose();
     super.dispose();

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/theme/colors.dart';
 import '../../emergency/widgets/sos_button.dart';
 import '../../shared/widgets/vite_video_player.dart';
+import '../widgets/vite_voice_guide_button.dart';
 
 class EnUrgenceScreen extends ConsumerWidget {
   final VoidCallback onNext;
@@ -169,7 +170,7 @@ class EnUrgenceScreen extends ConsumerWidget {
 
             const SizedBox(height: 18),
 
-            // 4h30 Time Window Card
+            // 4h30 Time Window Card with Top-Right Voice Guide Button
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -179,23 +180,40 @@ class EnUrgenceScreen extends ConsumerWidget {
                   color: AppColors.emergency.withValues(alpha: 0.3),
                 ),
               ),
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
-                    Icons.timer_outlined,
-                    color: AppColors.emergency,
-                    size: 28,
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.timer_outlined,
+                        color: AppColors.emergency,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Fenêtre critique : 4h30',
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: AppColors.emergency,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                      ),
+                      const ViteVoiceGuideButton(
+                        audioAssetPath: 'assets/audio/Signe-E.mp3',
+                        accentColor: AppColors.emergency,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Il existe une fenêtre thérapeutique critique de 4h30 maximum pour agir et limiter les séquelles irréversibles.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textPrimary,
-                            height: 1.4,
-                          ),
-                    ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Il existe une fenêtre thérapeutique critique de 4h30 maximum pour agir et limiter les séquelles irréversibles.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textPrimary,
+                          height: 1.4,
+                        ),
                   ),
                 ],
               ),

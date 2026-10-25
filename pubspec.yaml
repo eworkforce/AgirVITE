@@ -60,6 +60,7 @@ flutter:
     - assets/images/
     - assets/data/
     - assets/videos/
+    - assets/audio/
     - assets/fonts/
 
   fonts:

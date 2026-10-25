@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../app/theme/colors.dart';
 import '../../shared/widgets/vite_video_player.dart';
 import '../widgets/vite_single_sign_alert_banner.dart';
+import '../widgets/vite_voice_guide_button.dart';
 
 class IncapaciteScreen extends StatelessWidget {
   final VoidCallback onNext;
@@ -79,7 +80,7 @@ class IncapaciteScreen extends StatelessWidget {
                   Row(
                     children: [
                       const Icon(Icons.info_outline, color: AppColors.primary),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Comment tester ?',
@@ -88,6 +89,9 @@ class IncapaciteScreen extends StatelessWidget {
                                 color: AppColors.primary,
                               ),
                         ),
+                      ),
+                      const ViteVoiceGuideButton(
+                        audioAssetPath: 'assets/audio/Signe-I.mp3',
                       ),
                     ],
                   ),
