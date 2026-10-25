@@ -13,7 +13,7 @@ Owns all feature-first presentation code, screen flows, widget hierarchies, visu
 - `lib/features/emergency/`: Persistent `SOSButton` (2-second hold navigating to `/map?emergency=true`), `EmergencyMapOverlay`, and `showExternalActionConfirmOverlay`.
 - `lib/features/vite_guide/`: Tabbed educational module (`VisageScreen`, `IncapaciteScreen`, `TroubleScreen`, `EnUrgenceScreen`) with local `master_*.mp4` videos.
 - `lib/features/map/`: Stroke center map (`MapScreen`), marker widget (`CenterMapMarker`), slide-out menu (`MapSideMenu`), location marker (`UserLocationMarker`), and `CenterDetailsSheet`.
-- `lib/features/stories/`: Educational video/story feed.
+- `lib/features/stories/`: Interactive Recto/Verso 3D Flip-Card Prevention Hub (`StoriesFeedScreen`, `PreventionFlipCard`, and `StrokePreventionData`).
 - `lib/features/guardians/`: Contact (`Guardian`) model, repository, and list providers. User-facing terminology is strictly `"Contact"` / `"Premier contact"` / `"Contacts d'urgence"` (never `"Gardien"`).
 - `lib/features/profile/`: User profile and emergency contact management dialogs (`ProfileScreen`).
 - `lib/features/shared/`: Shared UI components (`CalmButton`, `ViteVideoPlayer`, `ViteVideoTheaterModal`).
