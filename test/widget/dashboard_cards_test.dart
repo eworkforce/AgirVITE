@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:agir_vite/features/dashboard/screens/dashboard_screen.dart';
 
 void main() {
-  testWidgets('Dashboard renders sober info banner and V, I, T, E letter boxes with image assets', (WidgetTester tester) async {
+  testWidgets('Dashboard renders stylized two-tier title and V, I, T, E letter boxes with image assets', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: MaterialApp(
@@ -16,11 +16,9 @@ void main() {
     // Initial frame
     await tester.pump();
 
-    // Verify sober info banner is rendered and old redundant title is gone
-    expect(
-      find.text("Chaque minute compte — Comprendre les signes d'alerte"),
-      findsOneWidget,
-    );
+    // Verify stylized header elements are rendered
+    expect(find.text('CHAQUE MINUTE COMPTE'), findsOneWidget);
+    expect(find.text("Comprendre les signes d'alerte"), findsOneWidget);
     expect(find.text("Les 4 Signes d'Urgence"), findsNothing);
 
     // Verify all 4 letters are rendered

@@ -31,9 +31,9 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 child: IntrinsicHeight(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 24.0),
+                    padding: const EdgeInsets.fromLTRB(20.0, 14.0, 20.0, 16.0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // 1. Header with greeting and profile avatar
                         Row(
@@ -93,63 +93,80 @@ class DashboardScreen extends ConsumerWidget {
                           ],
                         ),
 
-                        const SizedBox(height: 20),
+                        // Balanced top spacer so the title + 2x2 grid sit vertically centered
+                        const Spacer(flex: 1),
 
-                        // 2. Sober Info Banner (replaces empty space & redundant title)
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: AppColors.primary.withValues(alpha: 0.18),
-                              width: 1.2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.06),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 4,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  "Chaque minute compte — Comprendre les signes d'alerte",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.textPrimary,
-                                        height: 1.3,
-                                      ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        // 3. 2x2 Action Grid (V.I.T.E.)
+                        // 2. Stylized Editorial Title + 2x2 V.I.T.E. Grid
                         Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            // Stylized pill overline: "Chaque minute compte"
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.emergency.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.bolt_rounded,
+                                    size: 15,
+                                    color: AppColors.emergency,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'CHAQUE MINUTE COMPTE',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: AppColors.emergency,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 1.1,
+                                          fontSize: 11,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            // Stylized headline: "Comprendre les signes d'alerte"
+                            Text(
+                              "Comprendre les signes d'alerte",
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.primary,
+                                    fontSize: 21,
+                                    letterSpacing: -0.3,
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            // Subtle centered accent bar
+                            Container(
+                              width: 36,
+                              height: 3.5,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    AppColors.primary,
+                                    AppColors.secondary,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+
+                            // 2x2 Action Grid (V.I.T.E.)
                             Row(
                               children: [
                                 Expanded(
@@ -194,7 +211,9 @@ class DashboardScreen extends ConsumerWidget {
                           ],
                         ),
 
-                        const Spacer(),
+                        // Balanced bottom spacer + offset for the docked SOS arch
+                        const Spacer(flex: 1),
+                        const SizedBox(height: 44),
                       ],
                     ),
                   ),
@@ -226,7 +245,7 @@ class _ViteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1.0,
+      aspectRatio: 0.96,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
