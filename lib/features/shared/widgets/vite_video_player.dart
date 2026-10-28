@@ -17,7 +17,7 @@ class ViteVideoPlayer extends StatefulWidget {
     super.key,
     required this.assetPath,
     this.autoPlay = true,
-    this.looping = true,
+    this.looping = false,
     this.aspectRatio = 16 / 9,
     this.caption,
     this.borderRadius = 20,
@@ -118,12 +118,19 @@ class _ViteVideoPlayerState extends State<ViteVideoPlayer> {
     }
   }
 
-  void _togglePlayPause() {
-    if (_controller == null || !_isInitialized) return;
-    if (_controller!.value.isPlaying) {
-      _controller!.pause();
+  Future<void> _togglePlayPause() async {
+    final controller = _controller;
+    if (controller == null || !_isInitialized) return;
+    if (controller.value.isPlaying) {
+      await controller.pause();
     } else {
-      _controller!.play();
+      final duration = controller.value.duration;
+      final position = controller.value.position;
+      if (duration > Duration.zero &&
+          position >= duration - const Duration(milliseconds: 250)) {
+        await controller.seekTo(Duration.zero);
+      }
+      await controller.play();
     }
   }
 

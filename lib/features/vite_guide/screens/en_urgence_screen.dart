@@ -65,6 +65,7 @@ class EnUrgenceScreen extends ConsumerWidget {
                 assetPath: 'assets/videos/master_urgence_e.mp4',
                 caption: 'Protocole d\'urgence : Centre AVC et fenêtre 4h30',
                 aspectRatio: 16 / 9,
+                looping: false,
               ),
             ).animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.95, 0.95)),
 

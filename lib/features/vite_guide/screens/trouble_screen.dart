@@ -62,6 +62,7 @@ class TroubleScreen extends StatelessWidget {
                 assetPath: 'assets/videos/master_trouble_t.mp4',
                 caption: 'Test d\'élocution et de répétition de phrase',
                 aspectRatio: 16 / 9,
+                looping: false,
               ),
             ).animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.95, 0.95)),
 

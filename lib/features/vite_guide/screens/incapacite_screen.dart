@@ -62,6 +62,7 @@ class IncapaciteScreen extends StatelessWidget {
                 assetPath: 'assets/videos/master_incapacite_i.mp4',
                 caption: 'Test de Mingazzini : chute d\'un bras',
                 aspectRatio: 16 / 9,
+                looping: false,
               ),
             ).animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.95, 0.95)),
 

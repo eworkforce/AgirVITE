@@ -71,12 +71,21 @@ class _ViteVideoTheaterModalState extends State<ViteVideoTheaterModal> {
     super.dispose();
   }
 
-  void _togglePlayPause() {
-    if (widget.controller.value.isPlaying) {
-      widget.controller.pause();
-      setState(() => _showControls = true);
+  Future<void> _togglePlayPause() async {
+    final controller = widget.controller;
+    if (controller.value.isPlaying) {
+      await controller.pause();
+      if (mounted) {
+        setState(() => _showControls = true);
+      }
     } else {
-      widget.controller.play();
+      final duration = controller.value.duration;
+      final position = controller.value.position;
+      if (duration > Duration.zero &&
+          position >= duration - const Duration(milliseconds: 250)) {
+        await controller.seekTo(Duration.zero);
+      }
+      await controller.play();
     }
   }
 

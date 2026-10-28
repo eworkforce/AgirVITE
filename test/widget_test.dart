@@ -25,8 +25,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     await tester.pump(const Duration(seconds: 2));
 
-    // Verify that Brand Screen is now displayed
+    // Verify that Brand Screen is now displayed with top institutional logos
     expect(find.byType(BrandScreen), findsOneWidget);
+    expect(find.byKey(const Key('brand_ministry_logo')), findsOneWidget);
+    expect(find.byKey(const Key('brand_pnlmm_logo')), findsOneWidget);
     expect(find.text('V.I.T.E'), findsOneWidget);
     expect(find.text('Continuer'), findsOneWidget);
     

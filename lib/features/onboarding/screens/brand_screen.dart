@@ -16,16 +16,66 @@ class BrandScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
           child: Column(
             children: [
+              // 0. Top Institutional Logos: Ministry (top-left) & PNLMM Program (top-right)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 68,
+                    height: 68,
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      'assets/images/logo_ministere_sante.png',
+                      key: const Key('brand_ministry_logo'),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  Container(
+                    width: 68,
+                    height: 68,
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      'assets/images/logo_pnlmm.png',
+                      key: const Key('brand_pnlmm_logo'),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ],
+              ).animate().fadeIn(duration: 400.ms),
+
               const Spacer(flex: 1),
 
               // 1. V.I.T.E Pulse Badge (compact & balanced)
               Center(
                 child: Container(
-                  width: 120,
-                  height: 120,
+                  width: 112,
+                  height: 112,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white,

@@ -62,6 +62,7 @@ class VisageScreen extends StatelessWidget {
                 assetPath: 'assets/videos/master_visage_v.mp4',
                 caption: 'Affaissement d\'un côté du visage',
                 aspectRatio: 16 / 9,
+                looping: false,
               ),
             ).animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.95, 0.95)),
 
