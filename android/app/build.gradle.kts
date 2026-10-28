@@ -42,7 +42,7 @@ android {
     }
 
     androidResources {
-        noCompress += listOf("mp4", "m4v")
+        noCompress += listOf("mp4", "m4v", "mp3")
     }
 }
 
